@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Convert Images to JPG, PNG or WEBP Online | Work With Tools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg:#eef1f5;--card:#fff;--fg:#14202b;--mut:#5b6b7a;--line:#d5dce4;--acc:#2347e0;--accfg:#fff;--soft:#e4eaff;--err:#b42318;--ok:#157347;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f161d;--card:#18222c;--fg:#e8eef4;--mut:#93a4b4;--line:#2b3947;--acc:#7b97ff;--accfg:#0b1220;--soft:#1f2d4d;--err:#ff8a80;--ok:#6fd49a}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f161d;--card:#18222c;--fg:#e8eef4;--mut:#93a4b4;--line:#2b3947;--acc:#7b97ff;--accfg:#0b1220;--soft:#1f2d4d;--err:#ff8a80;--ok:#6fd49a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding:18px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+h1{font-size:1.65rem;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{margin:0 0 18px;color:var(--mut)}
+button,select{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--card);padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:500;min-height:42px}
+.btn:hover:not(:disabled){border-color:var(--acc)}
+.btn.pri{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,.drop:focus-within,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.drop{display:block;border:2px dashed var(--line);border-radius:14px;background:var(--card);padding:34px 16px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s}
+.drop.over{border-color:var(--acc);background:var(--soft)}
+.drop b{display:block;font-size:1.1rem}
+.drop span{color:var(--mut);font-size:.92rem}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:14px}
+.row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.lbl{font-weight:600;margin-right:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg label{padding:8px 16px;cursor:pointer;min-width:64px;text-align:center}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--acc);color:var(--accfg);font-weight:600}
+.seg label:has(input:focus-visible){outline:3px solid var(--acc);outline-offset:-3px}
+#qBox{display:flex;align-items:center;gap:10px;flex:1;min-width:220px}
+#qBox input{flex:1;accent-color:var(--acc);min-width:100px}
+#qVal{min-width:3ch;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.prog{margin-top:14px}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+.ptxt{font-size:.9rem;color:var(--mut);margin-top:6px}
+.msg{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--soft);font-size:.95rem}
+.msg.err{color:var(--err)}
+ul{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+li{display:grid;grid-template-columns:64px 1fr auto;gap:6px 12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.th{width:64px;height:64px;border-radius:8px;background:var(--bg) center/cover no-repeat;border:1px solid var(--line);display:grid;place-items:center;color:var(--mut);font-size:.75rem}
+.nm{font-weight:600;word-break:break-all}
+.meta{font-size:.88rem;color:var(--mut);display:flex;flex-wrap:wrap;gap:2px 14px}
+.meta .ok{color:var(--ok);font-weight:600}
+.meta .bad{color:var(--err)}
+.btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.btns .btn{padding:6px 12px;min-height:38px;font-size:.92rem}
+@media (max-width:560px){
+ li{grid-template-columns:56px 1fr}.th{width:56px;height:56px}
+ .btns{grid-column:1/-1;justify-content:stretch}.btns .btn{flex:1}
+ h1{font-size:1.4rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<meta name="description" content="Convert images between JPG, PNG and WEBP in one click. Free, private and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Convert Images to JPG, PNG or WEBP Online">
+<meta property="og:description" content="Convert images between JPG, PNG and WEBP in one click. Free, private and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+<div class="wrap">
+ <header>
+  <h1 data-i="title"></h1>
+ </header>
+ <p class="sub" data-i="sub"></p>
+
+ <label class="drop" id="drop">
+  <input type="file" id="file" accept="image/*" multiple>
+  <b data-i="drop"></b>
+  <span data-i="dropHint"></span>
+ </label>
+
+ <div class="panel">
+  <div class="row">
+   <div class="row" style="gap:8px">
+    <span class="lbl" data-i="format"></span>
+    <div class="seg" role="radiogroup">
+     <label><input type="radio" name="fmt" value="jpg" checked>JPG</label>
+     <label><input type="radio" name="fmt" value="png">PNG</label>
+     <label><input type="radio" name="fmt" value="webp">WEBP</label>
+    </div>
+   </div>
+   <div id="qBox">
+    <label class="lbl" for="q" data-i="quality"></label>
+    <input type="range" id="q" min="10" max="100" value="85">
+    <span id="qVal">85</span>
+   </div>
+  </div>
+  <div class="actions">
+   <button class="btn pri" id="convBtn" type="button"></button>
+   <button class="btn" id="dlAll" type="button" hidden></button>
+   <button class="btn" id="clearBtn" type="button" data-i="clear"></button>
+  </div>
+  <div class="prog" id="prog" hidden>
+   <div class="bar"><i id="barFill"></i></div>
+   <div class="ptxt" id="ptxt" aria-live="polite"></div>
+  </div>
+  <div class="msg" id="msg" hidden role="status"></div>
+ </div>
+
+ <ul id="list"></ul>
+</div>
+
+<script>
+const translations = {
+  en: {
+    title: "Convert to JPG / PNG / WEBP",
+    sub: "Images are converted in your browser. Nothing is uploaded.",
+    drop: "Drag and drop images here, or click to choose",
+    dropHint: "You can add several images at once",
+    format: "Output format",
+    quality: "Quality",
+    convert: "Convert",
+    converting: "Converting…",
+    dlOne: "Download",
+    dlZip: "Download ZIP",
+    zipping: "Building ZIP…",
+    clear: "Clear all",
+    before: "Before",
+    after: "After",
+    download: "Download",
+    remove: "Remove",
+    waiting: "Waiting",
+    working: "Processing…",
+    progress: "{n} of {total} done",
+    allDone: "All images are converted.",
+    notImage: "{n} file(s) skipped because they are not images.",
+    webpNo: "Your browser can’t export WEBP. Choose JPG or PNG instead.",
+    typeNo: "This browser can’t export {f}.",
+    fail: "Conversion failed: the image couldn’t be read or is too large.",
+    zipFail: "The ZIP library didn’t load. Check your connection and reload.",
+    smaller: "{p}% smaller",
+    larger: "{p}% larger",
+    px: "{w}×{h} px"
+  }
+};
+
+const MIME = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" };
+const $ = id => document.getElementById(id);
+const lang = "en";
+let items = [], nextId = 1, running = false;
+
+const t = (k, v = {}) => (translations[lang][k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? "");
+const fmt = () => document.querySelector('input[name="fmt"]:checked').value;
+const fmtBytes = n => n < 1024 ? n + " B" : n < 1048576 ? (n / 1024).toFixed(1) + " KB" : (n / 1048576).toFixed(2) + " MB";
+const tick = () => new Promise(r => setTimeout(r, 0));
+const baseName = n => n.replace(/\.[^.]+$/, "") || "image";
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = t("title");
+  document.querySelectorAll("[data-i]").forEach(el => el.textContent = t(el.dataset.i));
+  $("convBtn").textContent = running ? t("converting") : t("convert");
+  updateDlAll();
+  render();
+}
+
+function showMsg(text, isErr) {
+  const m = $("msg");
+  m.hidden = !text;
+  m.textContent = text || "";
+  m.classList.toggle("err", !!isErr);
+}
+
+function updateQuality() {
+  const f = fmt();
+  $("qBox").style.display = f === "png" ? "none" : "flex";
+  $("qVal").textContent = $("q").value;
+}
+
+function updateDlAll() {
+  const done = items.filter(i => i.blob);
+  const b = $("dlAll");
+  b.hidden = done.length === 0;
+  b.textContent = done.length === 1 ? t("dlOne") : t("dlZip");
+  $("convBtn").disabled = running || items.length === 0;
+  $("clearBtn").disabled = running || items.length === 0;
+}
+
+function freeItem(it) {
+  if (it.url) { URL.revokeObjectURL(it.url); it.url = null; }
+  it.blob = null;
+}
+
+function render() {
+  const ul = $("list");
+  ul.textContent = "";
+  for (const it of items) {
+    const li = document.createElement("li");
+    const th = document.createElement("div");
+    th.className = "th";
+    if (it.url) th.style.backgroundImage = 'url("' + it.url + '")';
+    else th.textContent = it.status === "working" ? "…" : "";
+    const mid = document.createElement("div");
+    const nm = document.createElement("div");
+    nm.className = "nm";
+    nm.textContent = it.file.name;
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const add = (txt, cls) => { const s = document.createElement("span"); s.textContent = txt; if (cls) s.className = cls; meta.appendChild(s); };
+    add(t("before") + ": " + fmtBytes(it.file.size));
+    if (it.status === "done") {
+      add(t("after") + ": " + fmtBytes(it.blob.size));
+      const d = Math.round((1 - it.blob.size / it.file.size) * 100);
+      add(d >= 0 ? t("smaller", { p: d }) : t("larger", { p: -d }), d >= 0 ? "ok" : "");
+      add(t("px", { w: it.w, h: it.h }));
+    } else if (it.status === "error") add(it.err, "bad");
+    else add(t(it.status === "working" ? "working" : "waiting"));
+    mid.append(nm, meta);
+    const btns = document.createElement("div");
+    btns.className = "btns";
+    if (it.status === "done") {
+      const d = document.createElement("button");
+      d.className = "btn"; d.type = "button"; d.textContent = t("download");
+      d.onclick = () => saveFile(it.outName, it.blob);
+      btns.appendChild(d);
+    }
+    const r = document.createElement("button");
+    r.className = "btn"; r.type = "button"; r.textContent = t("remove"); r.disabled = running;
+    r.onclick = () => { freeItem(it); items = items.filter(x => x !== it); render(); updateDlAll(); };
+    btns.appendChild(r);
+    li.append(th, mid, btns);
+    ul.appendChild(li);
+  }
+}
+
+function addFiles(fileList) {
+  const all = Array.from(fileList);
+  const imgs = all.filter(f => f.type.startsWith("image/"));
+  if (all.length - imgs.length) showMsg(t("notImage", { n: all.length - imgs.length }), true); else showMsg("");
+  for (const f of imgs) items.push({ id: nextId++, file: f, status: "pending", blob: null, url: null });
+  render(); updateDlAll();
+}
+
+async function decode(file) {
+  try {
+    if (window.createImageBitmap) {
+      const b = await createImageBitmap(file, { imageOrientation: "from-image" });
+      return { src: b, w: b.width, h: b.height, close: () => b.close() };
+    }
+  } catch (e) { /* fall back to <img>, which applies EXIF orientation itself */ }
+  const u = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = u;
+    await img.decode();
+    return { src: img, w: img.naturalWidth, h: img.naturalHeight, close() {} };
+  } finally { URL.revokeObjectURL(u); }
+}
+
+async function convertOne(it, f) {
+  const mime = MIME[f];
+  const q = +$("q").value / 100;
+  let dec;
+  try {
+    dec = await decode(it.file);
+    const c = document.createElement("canvas");
+    c.width = dec.w; c.height = dec.h;
+    const ctx = c.getContext("2d");
+    if (f === "jpg") { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height); }
+    ctx.drawImage(dec.src, 0, 0);
+    const blob = await new Promise(res => c.toBlob(res, mime, f === "png" ? undefined : q));
+    c.width = c.height = 0;
+    if (!blob || blob.type !== mime) {
+      it.status = "error";
+      it.err = f === "webp" ? t("webpNo") : t("typeNo", { f: f.toUpperCase() });
+      return;
+    }
+    it.blob = blob; it.w = dec.w; it.h = dec.h;
+    it.url = URL.createObjectURL(blob);
+    it.outName = baseName(it.file.name) + "." + f;
+    it.status = "done";
+  } catch (e) {
+    it.status = "error"; it.err = t("fail");
+  } finally { if (dec) dec.close(); }
+}
+
+async function runAll() {
+  if (running || !items.length) return;
+  running = true; showMsg("");
+  const f = fmt(), total = items.length;
+  items.forEach(i => { freeItem(i); i.status = "pending"; });
+  $("prog").hidden = false;
+  $("convBtn").textContent = t("converting");
+  render(); updateDlAll();
+  let n = 0;
+  for (const it of items) {
+    it.status = "working"; render();
+    await tick();
+    await convertOne(it, f);
+    n++;
+    $("barFill").style.width = (n / total * 100) + "%";
+    $("ptxt").textContent = t("progress", { n, total });
+    render();
+    await tick();
+  }
+  running = false;
+  $("convBtn").textContent = t("convert");
+  const firstErr = items.find(i => i.status === "error");
+  if (f === "webp" && firstErr && firstErr.err === t("webpNo")) showMsg(t("webpNo"), true);
+  else if (!firstErr) showMsg(t("allDone"));
+  render(); updateDlAll();
+}
+
+async function saveFile(name, blob) {
+  try {
+    const dl = window.claude && claude.use ? await claude.use("downloads") : null;
+    if (dl) { await dl.save({ filename: name, data: blob }); return; }
+  } catch (e) { if (e && e.code === "declined") return; }
+  const u = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000);
+}
+
+async function downloadAll() {
+  const done = items.filter(i => i.blob);
+  if (!done.length) return;
+  if (done.length === 1) return saveFile(done[0].outName, done[0].blob);
+  if (typeof JSZip === "undefined") return showMsg(t("zipFail"), true);
+  const b = $("dlAll");
+  b.disabled = true; b.textContent = t("zipping");
+  try {
+    const zip = new JSZip(), used = {};
+    for (const it of done) {
+      let n = it.outName;
+      if (used[n]) { const k = used[n]++; n = baseName(n) + "-" + k + n.slice(n.lastIndexOf(".")); } else used[n] = 1;
+      zip.file(n, it.blob);
+    }
+    const out = await zip.generateAsync({ type: "blob" });
+    await saveFile("converted-images.zip", out);
+  } finally { b.disabled = false; updateDlAll(); }
+}
+
+function clearAll() {
+  items.forEach(freeItem);
+  items = [];
+  $("prog").hidden = true; $("barFill").style.width = "0";
+  showMsg(""); render(); updateDlAll();
+}
+
+const drop = $("drop");
+["dragenter", "dragover"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", ev => addFiles(ev.dataTransfer.files));
+$("file").addEventListener("change", ev => { addFiles(ev.target.files); ev.target.value = ""; });
+$("q").addEventListener("input", updateQuality);
+document.querySelectorAll('input[name="fmt"]').forEach(r => r.addEventListener("change", updateQuality));
+$("convBtn").onclick = runAll;
+$("dlAll").onclick = downloadAll;
+$("clearBtn").onclick = clearAll;
+window.addEventListener("pagehide", () => items.forEach(freeItem));
+
+updateQuality();
+applyLang();
+</script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

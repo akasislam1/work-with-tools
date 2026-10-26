@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merge PDF Online – Combine PDF Files into One | Work With Tools</title>
+<style>
+  /* ---- Theme: change these to match your other tools ---- */
+  :root {
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --ink: #1c2433;
+    --muted: #667085;
+    --line: #dfe3ec;
+    --accent: #3a5bd9;
+    --accent-ink: #ffffff;
+    --accent-soft: #eaeefc;
+    --danger: #c0352b;
+    --danger-soft: #fdeceb;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Bengali", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 16px 56px; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  h1 { margin: 0; font-size: 1.6rem; }
+  .sub { margin: 4px 0 0; color: var(--muted); font-size: .95rem; }
+  .lang {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 999px; padding: 6px 14px; font: inherit; cursor: pointer;
+  }
+  .drop {
+    display: block; text-align: center; cursor: pointer;
+    background: var(--card); border: 2px dashed var(--line); border-radius: var(--radius);
+    padding: 32px 16px; transition: border-color .15s, background .15s;
+  }
+  .drop:hover, .drop.over, .drop:focus-within { border-color: var(--accent); background: var(--accent-soft); }
+  .drop strong { display: block; font-size: 1.05rem; }
+  .drop span { color: var(--muted); font-size: .9rem; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .errors { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .errors li {
+    display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+    background: var(--danger-soft); color: var(--danger);
+    border: 1px solid #f3c4c0; border-radius: 10px; padding: 10px 12px; font-size: .92rem;
+  }
+  .errors button { border: 0; background: none; color: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; }
+  .listhead { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 8px; }
+  .listhead h2 { margin: 0; font-size: 1.05rem; }
+  .linkbtn { border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; padding: 4px; }
+  .hint { color: var(--muted); font-size: .85rem; margin: 0 0 8px; }
+  #list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  #list li {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  }
+  #list li.dragging { box-shadow: 0 8px 24px rgba(28, 36, 51, .18); border-color: var(--accent); position: relative; z-index: 2; }
+  .handle {
+    touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none;
+    color: var(--muted); font-size: 1.3rem; padding: 6px 4px; line-height: 1;
+  }
+  .info { flex: 1; min-width: 0; }
+  .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meta { color: var(--muted); font-size: .85rem; }
+  .remove {
+    border: 1px solid var(--line); background: var(--card); color: var(--danger);
+    border-radius: 8px; padding: 6px 10px; font: inherit; font-size: .85rem; cursor: pointer;
+  }
+  .remove:hover { background: var(--danger-soft); }
+  .empty { text-align: center; color: var(--muted); padding: 20px 0; }
+  .merge {
+    width: 100%; margin-top: 20px; border: 0; border-radius: var(--radius);
+    background: var(--accent); color: var(--accent-ink);
+    font: inherit; font-weight: 600; font-size: 1.05rem; padding: 14px; cursor: pointer;
+  }
+  .merge:disabled { opacity: .45; cursor: not-allowed; }
+  .status { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 10px; min-height: 1.4em; }
+  button:focus-visible, .drop:focus-within, .handle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .hidden { display: none !important; }
+</style>
+<meta name="description" content="Combine several PDF files into one. Drag to set the order. Free, private and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Merge PDF Online – Combine PDF Files into One">
+<meta property="og:description" content="Combine several PDF files into one. Drag to set the order. Free, private and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1 data-i18n="title">Merge PDF</h1>
+      <p class="sub" data-i18n="subtitle"></p>
+    </div>
+    <button class="lang" id="langBtn" style="display:none" aria-hidden="true" tabindex="-1" type="button"></button>
+  </header>
+
+  <label class="drop" id="drop">
+    <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
+    <strong data-i18n="dropTitle"></strong>
+    <span data-i18n="dropHint"></span>
+  </label>
+
+  <ul class="errors" id="errors" role="alert"></ul>
+
+  <div id="listSection" class="hidden">
+    <div class="listhead">
+      <h2 id="listTitle"></h2>
+      <button class="linkbtn" id="clearBtn" type="button" data-i18n="clearAll"></button>
+    </div>
+    <p class="hint" data-i18n="dragHint"></p>
+    <ul id="list"></ul>
+  </div>
+  <p class="empty" id="empty" data-i18n="empty"></p>
+
+  <button class="merge" id="mergeBtn" type="button" disabled></button>
+  <div class="status" id="status" aria-live="polite"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="script.js"></script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

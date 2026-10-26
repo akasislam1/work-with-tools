@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Work With Tools – Free image and PDF tools in your browser</title>
+<meta name="description" content="Compress, convert, crop and watermark images, and work with PDF files. Free online tools that run in your browser. No sign-up, and your files never leave your device.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Work With Tools – Free image and PDF tools">
+<meta property="og:description" content="Free image and PDF tools that run in your browser. No sign-up, no uploads.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body class="wt-home">
+
+<div class="wt-bar">
+  <a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a>
+  <a class="wt-all" href="#tools">All tools</a>
+</div>
+
+<header class="wt-hero">
+  <div class="wt-hero-in">
+    <h1 id="heroTitle">Image and PDF tools that run in your browser</h1>
+    <p id="heroText">Compress, convert, crop and watermark your files without uploading them anywhere. Free, and no sign-up needed.</p>
+    <label class="wt-search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" placeholder="Search tools, e.g. compress or merge" autocomplete="off" aria-label="Search tools">
+    </label>
+    <nav class="wt-jump" id="jump" aria-label="Tool categories"></nav>
+  </div>
+</header>
+
+<main class="wt-main" id="tools">
+  <div id="sections"></div>
+  <p class="wt-empty" id="empty" hidden></p>
+</main>
+
+<script src="assets/tools.js"></script>
+<script>
+(function () {
+  var tools = window.TOOLS || [], cats = window.TOOL_CATS || [], site = window.SITE || {};
+  var host = document.getElementById("sections");
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  if (site.heroTitle) document.getElementById("heroTitle").textContent = site.heroTitle;
+  if (site.heroText) document.getElementById("heroText").textContent = site.heroText;
+
+  function card(t){
+    var inner = '<span class="wt-ico"><svg viewBox="0 0 24 24" aria-hidden="true">' + (t.icon || "") + '</svg></span><span><h3>' + esc(t.name) +
+      (t.status === "soon" ? '<span class="wt-pill">Coming soon</span>' : '') +
+      (t.status === "paused" ? '<span class="wt-pill paused">Paused</span>' : '') +
+      '</h3><p>' + esc(t.desc || "") + '</p></span>';
+    var s = esc((t.name + " " + (t.kw || "")).toLowerCase());
+    return t.status === "live"
+      ? '<a class="wt-card" href="/' + esc(t.slug) + '/" data-s="' + s + '">' + inner + '</a>'
+      : '<div class="wt-card ' + t.status + '" data-s="' + s + '">' + inner + '</div>';
+  }
+  var visible = tools.filter(function (t) { return t.status !== "hidden"; });
+  var used = cats.filter(function (c) { return visible.some(function (t) { return t.cat === c.id; }); });
+
+  host.innerHTML = used.map(function (c) {
+    var list = visible.filter(function (t) { return t.cat === c.id; });
+    return '<section class="wt-sec c-' + esc(c.color || "blue") + '" id="cat-' + esc(c.id) + '"><h2>' + esc(c.title) + '</h2><p>' + esc(c.blurb || "") +
+      '</p><div class="wt-grid">' + list.map(card).join("") + '</div></section>';
+  }).join("");
+  document.getElementById("jump").innerHTML = used.map(function (c) {
+    return '<a href="#cat-' + esc(c.id) + '">' + esc(c.title) + '</a>';
+  }).join("");
+
+  var q = document.getElementById("q"), empty = document.getElementById("empty");
+  q.addEventListener("input", function () {
+    var v = q.value.trim().toLowerCase(), shown = 0;
+    host.querySelectorAll(".wt-card").forEach(function (el) {
+      var ok = !v || el.dataset.s.indexOf(v) !== -1;
+      el.hidden = !ok; if (ok) shown++;
+    });
+    host.querySelectorAll(".wt-sec").forEach(function (s) {
+      s.hidden = !s.querySelector(".wt-card:not([hidden])");
+    });
+    empty.hidden = shown > 0;
+    empty.textContent = 'No tool matches "' + q.value.trim() + '". Try another word.';
+  });
+})();
+</script>
+<script src="assets/site.js"></script>
+</body>
+</html>

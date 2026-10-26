@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crop Photos Online – Crop, Rotate and Flip | Work With Tools</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<style type="text/tailwindcss">
+  @layer components {
+    .sec { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
+    .sec > summary { @apply flex cursor-pointer select-none items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800; }
+    .sec-body { @apply space-y-3 border-t border-slate-100 px-4 py-4; }
+    .row2 { @apply grid grid-cols-[6.25rem_1fr] items-center gap-x-3 sm:grid-cols-[8rem_1fr]; }
+    .lbl { @apply text-sm leading-tight text-slate-600; }
+    .btn-primary { @apply w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-progress disabled:opacity-60; }
+    .btn-ghost { @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50; }
+    .chip { @apply rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50; }
+    .seg { @apply flex rounded-xl bg-slate-100 p-1; }
+    .seg > label { @apply flex-1; }
+    .seg span { @apply block cursor-pointer rounded-lg px-3 py-1.5 text-center text-sm font-medium text-slate-600 transition; }
+  }
+</style>
+<style>
+  [hidden] { display: none !important; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", "Noto Sans", sans-serif; }
+  summary::-webkit-details-marker { display: none; }
+  .seg input:checked + span { background: #fff; color: #4338ca; box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+  .seg input:focus-visible + span { outline: 2px solid #a5b4fc; }
+  .chip.on, .chip.on:hover { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+  .off { opacity: .5; pointer-events: none; }
+  #stage .cropper-view-box { outline-color: #6366f1; }
+  #stage .cropper-point { background-color: #6366f1; width: 10px; height: 10px; opacity: 1; }
+  #stage .cropper-point.point-n, #stage .cropper-point.point-s { margin-left: -5px; }
+  #stage .cropper-point.point-e, #stage .cropper-point.point-w { margin-top: -5px; }
+  .dragging { outline: 2px dashed #6366f1; outline-offset: -4px; }
+</style>
+<meta name="description" content="Crop, rotate and flip photos right in your browser. Nothing is uploaded to a server.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Crop Photos Online – Crop, Rotate and Flip">
+<meta property="og:description" content="Crop, rotate and flip photos right in your browser. Nothing is uploaded to a server.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+
+  <header class="mx-auto flex max-w-6xl items-start justify-between gap-3 px-4 pb-3 pt-6">
+    <div class="min-w-0">
+      <h1 class="text-xl font-bold tracking-tight sm:text-2xl" data-i18n="title">Crop Photos</h1>
+      <p class="mt-1 text-sm text-slate-500" data-i18n="subtitle">Crop, rotate and flip photos right in your browser. Nothing is uploaded to a server.</p>
+      <a href="/" class="mt-2 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500" data-i18n="back">← All tools</a>
+    </div>
+    <div class="seg shrink-0" role="radiogroup" aria-label="Language" style="display:none" hidden>
+      <label><input type="radio" name="lang" value="en" class="sr-only"><span>EN</span></label>
+      <label><input type="radio" name="lang" value="bn" class="sr-only"><span>বাংলা</span></label>
+    </div>
+  </header>
+
+  <section class="mx-auto max-w-6xl px-4 pb-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <label for="fileInput" class="mb-2 block text-sm font-semibold" data-i18n="photo">Photo</label>
+      <input type="file" id="fileInput" accept="image/*"
+        class="block w-full text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-indigo-500">
+      <p class="mt-2 text-xs text-slate-400" data-i18n="fileHint">You can also drop a photo onto the preview, or click the preview area to browse.</p>
+    </div>
+  </section>
+
+  <main class="mx-auto max-w-6xl px-4 pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-start lg:gap-6">
+
+    <section class="sticky top-0 z-30 -mx-4 bg-slate-50/90 px-4 py-2 backdrop-blur lg:top-6 lg:mx-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+      <div id="previewCard" class="rounded-2xl border border-slate-200 bg-white p-2 shadow-md transition lg:p-3 lg:shadow-sm">
+        <div id="stage" class="relative h-[40vh] min-h-[14rem] overflow-hidden rounded-xl bg-slate-100 lg:h-[70vh]">
+          <img id="image" alt="" class="block max-w-full">
+          <div id="emptyState" role="button" tabindex="0" data-i18n-aria="dropAria" aria-label="Choose a photo or drop it here" class="absolute inset-2 z-10 grid cursor-pointer place-items-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-100/95 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400">
+            <div class="text-slate-400">
+              <svg class="mx-auto h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.16-5.16a2.25 2.25 0 013.18 0l5.16 5.16m-1.5-1.5l1.41-1.41a2.25 2.25 0 013.18 0l2.25 2.25M3.75 19.5h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zM9.75 8.25h.008v.008H9.75V8.25z"/></svg>
+              <p class="mt-2 text-sm font-medium text-slate-500" data-i18n="dropTitle">Drop a photo here</p>
+              <p class="text-xs" data-i18n="dropSub">or click to choose a file</p>
+            </div>
+          </div>
+        </div>
+        <p id="info" class="mt-2 line-clamp-2 px-1 text-center text-xs text-slate-500"></p>
+      </div>
+    </section>
+
+    <div id="controls" class="off mt-2 space-y-3 lg:mt-0">
+
+      <details class="sec group" open>
+        <summary><span data-i18n="secRatio">Aspect ratio</span>
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" class="chip on" data-ratio="free" data-i18n="free">Free</button>
+            <button type="button" class="chip" data-ratio="1/1">1:1</button>
+            <button type="button" class="chip" data-ratio="4/3">4:3</button>
+            <button type="button" class="chip" data-ratio="16/9">16:9</button>
+            <button type="button" class="chip" data-ratio="9/16">9:16</button>
+            <button type="button" class="chip" data-ratio="4/5">4:5</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group" open>
+        <summary><span data-i18n="secPreset">Presets</span>
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-1">
+            <button type="button" class="chip" data-preset="passport" data-i18n="pPassport">Passport 40×50 mm</button>
+            <button type="button" class="chip" data-preset="stamp" data-i18n="pStamp">Stamp 30×35 mm</button>
+            <button type="button" class="chip" data-preset="pp" data-i18n="pPP">PP 300×300 px</button>
+          </div>
+          <p class="text-xs leading-snug text-slate-400" data-i18n="presetNote">Millimetre sizes are exported at 300 DPI.</p>
+        </div>
+      </details>
+
+      <details class="sec group" open>
+        <summary><span data-i18n="secTransform">Rotate &amp; flip</span>
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="chip" id="rotL" data-i18n="rotL">⟲ Rotate left</button>
+            <button type="button" class="chip" id="rotR" data-i18n="rotR">⟳ Rotate right</button>
+            <button type="button" class="chip" id="flipH" data-i18n="flipH">⇆ Flip horizontal</button>
+            <button type="button" class="chip" id="flipV" data-i18n="flipV">⇅ Flip vertical</button>
+          </div>
+        </div>
+      </details>
+
+      <div class="sec space-y-3 p-4">
+        <div class="row2">
+          <span class="lbl" data-i18n="format">Format</span>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="fmt" value="png" checked class="sr-only"><span>PNG</span></label>
+            <label><input type="radio" name="fmt" value="jpg" class="sr-only"><span>JPG</span></label>
+          </div>
+        </div>
+        <button type="button" id="resetBtn" class="btn-ghost" data-i18n="reset">Reset</button>
+        <button type="button" id="dlBtn" class="btn-primary" data-i18n="download">Download cropped photo</button>
+      </div>
+    </div>
+  </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const img = $('image'), info = $('info'), controls = $('controls'), fileInput = $('fileInput');
+  const emptyState = $('emptyState'), previewCard = $('previewCard');
+
+  /* ---------- Language (EN / বাংলা) ---------- */
+  const I18N = {
+    en: {
+      title: 'Crop Photos',
+      subtitle: 'Crop, rotate and flip photos right in your browser. Nothing is uploaded to a server.',
+      back: '← All tools',
+      photo: 'Photo',
+      fileHint: 'You can also drop a photo onto the preview, or click the preview area to browse.',
+      dropAria: 'Choose a photo or drop it here',
+      dropTitle: 'Drop a photo here', dropSub: 'or click to choose a file',
+      secRatio: 'Aspect ratio', free: 'Free',
+      secPreset: 'Presets',
+      pPassport: 'Passport 40×50 mm', pStamp: 'Stamp 30×35 mm', pPP: 'PP 300×300 px',
+      presetNote: 'Millimetre sizes are exported at 300 DPI.',
+      secTransform: 'Rotate & flip',
+      rotL: '⟲ Rotate left', rotR: '⟳ Rotate right', flipH: '⇆ Flip horizontal', flipV: '⇅ Flip vertical',
+      format: 'Format', reset: 'Reset', download: 'Download cropped photo',
+      chooseHint: 'Choose a photo to start',
+      loaded: '{name} — original {w} × {h} px',
+      cropArea: 'Crop area: {w} × {h} px',
+      output: 'Output: {w} × {h} px',
+      errNotImage: 'That file is not an image. Please choose a JPG, PNG or WebP photo.',
+      errLoad: 'This image could not be opened. Try another file.',
+      errLib: 'Cropper.js failed to load. Check your internet connection and reload the page.',
+      errDl: 'The file could not be created. Try a smaller crop area.'
+    },
+    bn: {
+      title: 'ছবি ক্রপ করুন',
+      subtitle: 'ব্রাউজারেই ছবি ক্রপ, রোটেট ও ফ্লিপ করুন। কোনো ছবি সার্ভারে আপলোড হয় না।',
+      back: '← সব টুল',
+      photo: 'ছবি',
+      fileHint: 'প্রিভিউয়ের ওপর ছবি ড্রপ করতে পারেন, অথবা প্রিভিউয়ে ক্লিক করে ফাইল বেছে নিতে পারেন।',
+      dropAria: 'ছবি বেছে নিন বা এখানে ড্রপ করুন',
+      dropTitle: 'এখানে ছবি ড্রপ করুন', dropSub: 'অথবা ক্লিক করে ফাইল বেছে নিন',
+      secRatio: 'রেশিও', free: 'ফ্রি',
+      secPreset: 'প্রিসেট',
+      pPassport: 'পাসপোর্ট 40×50mm', pStamp: 'স্ট্যাম্প 30×35mm', pPP: 'PP 300×300px',
+      presetNote: 'মিলিমিটার সাইজ ৩০০ DPI-তে এক্সপোর্ট হয়।',
+      secTransform: 'রোটেট ও ফ্লিপ',
+      rotL: '⟲ বামে ঘোরান', rotR: '⟳ ডানে ঘোরান', flipH: '⇆ বাম-ডান ফ্লিপ', flipV: '⇅ উপর-নিচ ফ্লিপ',
+      format: 'ফরম্যাট', reset: 'রিসেট', download: 'ক্রপ করা ছবি ডাউনলোড করুন',
+      chooseHint: 'শুরু করতে একটি ছবি বেছে নিন',
+      loaded: '{name} — আসল সাইজ {w} × {h} px',
+      cropArea: 'ক্রপ এরিয়া: {w} × {h} px',
+      output: 'আউটপুট: {w} × {h} px',
+      errNotImage: 'এটি ছবির ফাইল নয়। JPG, PNG বা WebP ছবি বেছে নিন।',
+      errLoad: 'ছবিটি খোলা যায়নি। অন্য ফাইল চেষ্টা করুন।',
+      errLib: 'Cropper.js লোড হয়নি। ইন্টারনেট সংযোগ দেখে পেজটি রিলোড করুন।',
+      errDl: 'ফাইল তৈরি করা যায়নি। ক্রপ এরিয়া ছোট করে চেষ্টা করুন।'
+    }
+  };
+  let lang = 'en';
+
+  const t = (key, v = {}) => (I18N[lang][key] || key).replace(/\{(\w+)\}/g, (_, k) => (k in v ? v[k] : ''));
+  let infoState = { key: 'chooseHint', vars: {} };
+  function setInfo(key, vars = {}) { infoState = { key, vars }; info.textContent = t(key, vars); }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+    document.querySelectorAll('input[name="lang"]').forEach((r) => { r.checked = r.value === lang; });
+    info.textContent = t(infoState.key, infoState.vars);
+  }
+  document.querySelectorAll('input[name="lang"]').forEach((r) =>
+    r.addEventListener('change', () => {
+      lang = r.value;
+      try { localStorage.setItem('siteLang', lang); } catch {}
+      applyLang();
+    })
+  );
+
+  /* ---------- Cropper state ---------- */
+  const PRESETS = {                         // mm sizes at 300 DPI
+    passport: { w: 472, h: 591 },           // 40×50 mm
+    stamp:    { w: 354, h: 413 },           // 30×35 mm
+    pp:       { w: 300, h: 300 }            // 300×300 px
+  };
+  let cropper = null, srcURL = null, baseName = 'photo', outSize = null, origSize = null;
+  let flipX = 1, flipY = 1;
+
+  function setActive(el) {
+    document.querySelectorAll('.chip[data-ratio], .chip[data-preset]').forEach((c) => c.classList.toggle('on', c === el));
+  }
+
+  function showCropInfo(d) {
+    const w = Math.round(d.width), h = Math.round(d.height);
+    if (outSize) setInfo('output', { w: outSize.w, h: outSize.h });
+    else setInfo('cropArea', { w, h });
+  }
+
+  function openFile(file) {
+    if (!file) return;
+    if (!file.type || !file.type.startsWith('image/')) { setInfo('errNotImage'); return; }
+    if (typeof Cropper === 'undefined') { setInfo('errLib'); return; }
+
+    if (cropper) { cropper.destroy(); cropper = null; }
+    if (srcURL) URL.revokeObjectURL(srcURL);
+    srcURL = URL.createObjectURL(file);
+    baseName = file.name.replace(/\.[^.]+$/, '') || 'photo';
+    flipX = flipY = 1;
+    outSize = null;
+    setActive(document.querySelector('.chip[data-ratio="free"]'));
+
+    img.onerror = () => { img.onload = null; setInfo('errLoad'); };
+    img.onload = () => {
+      img.onload = null;
+      origSize = { w: img.naturalWidth, h: img.naturalHeight };
+      cropper = new Cropper(img, {
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 0.9,
+        aspectRatio: NaN,
+        background: true,
+        responsive: true,
+        restore: false,
+        guides: true,
+        center: true,
+        highlight: false,
+        toggleDragModeOnDblclick: false,
+        ready() {
+          emptyState.hidden = true;
+          controls.classList.remove('off');
+          setInfo('loaded', { name: baseName, w: origSize.w, h: origSize.h });
+        },
+        crop(e) { showCropInfo(e.detail); }
+      });
+    };
+    img.src = srcURL;
+  }
+
+  /* ---------- Upload: input, click, drag & drop ---------- */
+  fileInput.addEventListener('change', () => { openFile(fileInput.files[0]); fileInput.value = ''; });
+  emptyState.addEventListener('click', () => fileInput.click());
+  emptyState.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+  ['dragover', 'drop'].forEach((ev) => window.addEventListener(ev, (e) => e.preventDefault()));
+  previewCard.addEventListener('dragover', () => previewCard.classList.add('dragging'));
+  ['dragleave', 'drop'].forEach((ev) => previewCard.addEventListener(ev, () => previewCard.classList.remove('dragging')));
+  previewCard.addEventListener('drop', (e) => {
+    e.preventDefault();
+    openFile(e.dataTransfer && e.dataTransfer.files[0]);
+  });
+
+  /* ---------- Ratios & presets ---------- */
+  document.querySelectorAll('.chip[data-ratio]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!cropper) return;
+      outSize = null;
+      setActive(b);
+      const v = b.dataset.ratio;
+      if (v === 'free') cropper.setAspectRatio(NaN);
+      else { const [a, c] = v.split('/').map(Number); cropper.setAspectRatio(a / c); }
+    })
+  );
+  document.querySelectorAll('.chip[data-preset]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!cropper) return;
+      outSize = PRESETS[b.dataset.preset];
+      setActive(b);
+      cropper.setAspectRatio(outSize.w / outSize.h);
+      showCropInfo(cropper.getData());
+    })
+  );
+
+  /* ---------- Rotate / flip / reset ---------- */
+  $('rotL').addEventListener('click', () => cropper && cropper.rotate(-90));
+  $('rotR').addEventListener('click', () => cropper && cropper.rotate(90));
+  $('flipH').addEventListener('click', () => { if (cropper) { flipX *= -1; cropper.scaleX(flipX); } });
+  $('flipV').addEventListener('click', () => { if (cropper) { flipY *= -1; cropper.scaleY(flipY); } });
+  $('resetBtn').addEventListener('click', () => {
+    if (!cropper) return;
+    flipX = flipY = 1;
+    cropper.reset();
+  });
+
+  /* ---------- Download (PNG / JPG) ---------- */
+  $('dlBtn').addEventListener('click', () => {
+    if (!cropper) return;
+    const fmt = document.querySelector('input[name="fmt"]:checked').value;
+    const mime = fmt === 'jpg' ? 'image/jpeg' : 'image/png';
+    const opts = { imageSmoothingEnabled: true, imageSmoothingQuality: 'high' };
+    if (fmt === 'jpg') opts.fillColor = '#ffffff';     // JPG has no transparency
+    if (outSize) { opts.width = outSize.w; opts.height = outSize.h; }
+
+    let cv = cropper.getCroppedCanvas(opts);
+    if (!cv) { setInfo('errDl'); return; }
+    if (outSize && (cv.width !== outSize.w || cv.height !== outSize.h)) {   // guarantee the exact preset size
+      const fix = document.createElement('canvas');
+      fix.width = outSize.w; fix.height = outSize.h;
+      const c = fix.getContext('2d');
+      c.imageSmoothingQuality = 'high';
+      if (fmt === 'jpg') { c.fillStyle = '#fff'; c.fillRect(0, 0, fix.width, fix.height); }
+      c.drawImage(cv, 0, 0, fix.width, fix.height);
+      cv = fix;
+    }
+    cv.toBlob((blob) => {
+      if (!blob) { setInfo('errDl'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${baseName}-cropped.${fmt}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }, mime, 0.92);
+  });
+
+  applyLang();
+</script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

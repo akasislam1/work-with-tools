@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compress Images Online – Reduce Photo File Size | Work With Tools</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style type="text/tailwindcss">
+  @layer components {
+    .sec { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
+    .sec > summary { @apply flex cursor-pointer select-none items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800; }
+    .sec-body { @apply space-y-3 border-t border-slate-100 px-4 py-4; }
+    .row { @apply grid grid-cols-[6.25rem_1fr_3.25rem] items-center gap-x-3 sm:grid-cols-[8rem_1fr_3.5rem]; }
+    .row2 { @apply grid grid-cols-[6.25rem_1fr] items-center gap-x-3 sm:grid-cols-[8rem_1fr]; }
+    .lbl { @apply text-sm leading-tight text-slate-600; }
+    .val { @apply text-right text-sm tabular-nums text-slate-500; }
+    .rng { @apply h-2 w-full cursor-pointer accent-indigo-600; }
+    .fld { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200; }
+    .num { @apply w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-right text-sm tabular-nums focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200; }
+    .sub { @apply pt-1 text-xs font-semibold uppercase tracking-wide text-slate-400; }
+    .btn-primary { @apply w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-progress disabled:opacity-60; }
+    .btn-ghost { @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50; }
+    .seg { @apply flex rounded-xl bg-slate-100 p-1; }
+    .seg > label { @apply flex-1; }
+    .seg span { @apply block cursor-pointer rounded-lg px-3 py-1.5 text-center text-sm font-medium text-slate-600 transition; }
+  }
+</style>
+<style>
+  [hidden] { display: none !important; }
+  summary::-webkit-details-marker { display: none; }
+  :focus-visible { outline: 2px solid #a5b4fc; outline-offset: 2px; }
+  fieldset:disabled { opacity: .6; }
+  /* Segmented buttons (same look as the other tools) */
+  .seg { flex-wrap: wrap; gap: .25rem; }
+  .seg > button { flex: 1 1 auto; border-radius: .5rem; padding: .375rem .75rem; font-size: .875rem; font-weight: 500; color: #475569; transition: .15s; }
+  .seg > button.on { background: #fff; color: #4338ca; box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+  .btn-ghost:disabled { opacity: .5; cursor: not-allowed; }
+  /* Drop zone */
+  .drop { display: block; cursor: pointer; border: 2px dashed #cbd5e1; border-radius: 1rem; background: #fff; padding: 1.5rem 1rem; text-align: center; transition: .15s; }
+  .drop:hover, .drop.over { border-color: #6366f1; background: #eef2ff; }
+  /* Image list rows (built by JS) */
+  .item { display: flex; align-items: center; gap: .75rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: .625rem; box-shadow: 0 1px 2px rgb(0 0 0 / .05); }
+  .item img { width: 4rem; height: 4rem; flex: none; object-fit: cover; border-radius: .5rem; background: #f1f5f9; }
+  .info { flex: 1; min-width: 0; }
+  .name { font-size: .875rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sizes { font-size: .75rem; color: #64748b; }
+  .badge { display: inline-block; margin-left: .375rem; padding: 0 .5rem; border-radius: 9999px; font-weight: 600; background: #d1fae5; color: #047857; }
+  .note { margin-top: .125rem; font-size: .75rem; }
+  .note.warn { color: #d97706; } .note.err { color: #dc2626; }
+  .ibtns { display: flex; flex: none; gap: .375rem; }
+  .ibtns button { min-width: 2.25rem; height: 2.25rem; border: 1px solid #cbd5e1; border-radius: .5rem; background: #fff; color: #475569; }
+  .ibtns button:hover { background: #f8fafc; }
+  .zoom { cursor: zoom-in; }
+  /* Before/after dialog */
+  .cmp-img { position: relative; line-height: 0; }
+  .cmp-img img { width: 100%; max-height: 65vh; object-fit: contain; display: block; }
+  .cmp-img #cmpB { position: absolute; inset: 0; height: 100%; }
+  @media (max-width: 520px) { .item { flex-wrap: wrap; } .item img { width: 3rem; height: 3rem; } .ibtns { width: 100%; justify-content: flex-end; } }
+</style>
+<meta name="description" content="Reduce the file size of JPG, PNG and WEBP images while keeping quality. Free, private and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Compress Images Online – Reduce Photo File Size">
+<meta property="og:description" content="Reduce the file size of JPG, PNG and WEBP images while keeping quality. Free, private and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+
+  <header class="mx-auto max-w-6xl px-4 pb-3 pt-6">
+    <h1 class="mt-1 text-xl font-bold tracking-tight sm:text-2xl" data-i18n="title"></h1>
+    <p class="mt-1 text-sm text-slate-500" data-i18n="subtitle"></p>
+  </header>
+
+  <main class="mx-auto grid max-w-6xl gap-4 px-4 pb-12 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-start lg:gap-6">
+
+    <!-- Upload area: click or drag & drop -->
+    <section class="lg:col-start-1 lg:row-start-1">
+      <label id="drop" class="drop" for="file" tabindex="0">
+        <svg class="mx-auto h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+        <p class="mt-2 text-sm font-medium text-slate-500" data-i18n="drop1"></p>
+        <p class="text-xs text-slate-400" data-i18n="drop2"></p>
+      </label>
+      <input type="file" id="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+    </section>
+
+    <!-- Controls (sticky on desktop) -->
+    <div class="space-y-3 lg:sticky lg:top-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+      <details class="sec group" open>
+        <summary>Compression settings <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg></summary>
+        <!-- fieldset gets disabled while processing -->
+        <fieldset id="settings" class="sec-body min-w-0">
+          <div class="row2">
+            <span class="lbl" data-i18n="mode"></span>
+            <div class="seg" id="modeSeg">
+              <button type="button" data-mode="quality" class="on" data-i18n="modeQ"></button>
+              <button type="button" data-mode="target" data-i18n="modeT"></button>
+            </div>
+          </div>
+
+          <!-- Mode A: quality slider -->
+          <div id="qBox" class="row">
+            <label class="lbl" for="q" data-i18n="quality"></label>
+            <input type="range" id="q" class="rng" min="10" max="100" step="1" value="75">
+            <output id="qOut" class="val">75%</output>
+          </div>
+
+          <!-- Mode B: target size -->
+          <div id="tBox" class="space-y-3" hidden>
+            <div class="row2">
+              <span class="lbl" data-i18n="target"></span>
+              <div class="seg" id="chips">
+                <button type="button" data-kb="100">100 KB</button>
+                <button type="button" data-kb="200" class="on">200 KB</button>
+                <button type="button" data-kb="500">500 KB</button>
+              </div>
+            </div>
+            <div class="row2">
+              <label class="lbl" for="kb">Custom (KB)</label>
+              <input type="number" id="kb" class="fld" min="5" step="1" value="200" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="row2">
+            <span class="lbl" data-i18n="format"></span>
+            <div class="seg" id="fmtSeg">
+              <button type="button" data-fmt="original" class="on" data-i18n="fOrig"></button>
+              <button type="button" data-fmt="image/jpeg">JPG</button>
+              <button type="button" data-fmt="image/png">PNG</button>
+              <button type="button" data-fmt="image/webp">WebP</button>
+            </div>
+          </div>
+
+          <div class="row2">
+            <span class="lbl" data-i18n="maxDim"></span>
+            <div class="seg" id="dimSeg">
+              <button type="button" data-dim="0" class="on" data-i18n="dimOrig"></button>
+              <button type="button" data-dim="3840">4K</button>
+              <button type="button" data-dim="1920">1920</button>
+              <button type="button" data-dim="1280">1280</button>
+              <button type="button" data-dim="800">800</button>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2 text-sm text-slate-600">
+            <input type="checkbox" id="exif" class="h-4 w-4 accent-indigo-600"><span data-i18n="keepExif"></span>
+          </label>
+        </fieldset>
+      </details>
+
+      <div class="sec space-y-3 p-4">
+        <p id="hint" class="rounded-xl bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-700" hidden></p>
+        <button type="button" id="runBtn" class="btn-primary" disabled></button>
+        <button type="button" id="clearBtn" class="btn-ghost" data-i18n="clear" disabled></button>
+        <div id="prog" hidden>
+          <div class="h-2 overflow-hidden rounded-full bg-slate-200">
+            <div id="barFill" class="h-full w-0 rounded-full bg-indigo-600 transition-[width] duration-200"></div>
+          </div>
+          <p id="progTxt" class="mt-1.5 text-center text-xs text-slate-500"></p>
+        </div>
+        <p class="text-xs text-slate-400" data-i18n="privacy"></p>
+      </div>
+    </div>
+
+    <!-- Results: image list, summary, download -->
+    <section class="lg:col-start-1 lg:row-start-2">
+      <ul id="list" class="space-y-2" aria-live="polite"></ul>
+      <p id="summary" class="mt-3 text-sm font-semibold text-slate-700"></p>
+      <div id="dl" class="mt-3"></div>
+    </section>
+  </main>
+
+  <!-- Before/after comparison dialog -->
+  <dialog id="cmp" class="w-[min(92vw,760px)] rounded-2xl p-4 shadow-xl backdrop:bg-black/60">
+    <div class="cmp-img"><img id="cmpA" alt=""><img id="cmpB" alt=""></div>
+    <input type="range" id="cmpR" class="rng mt-3" min="0" max="100" value="50" aria-label="Compare">
+    <div class="my-2 flex justify-between gap-2 text-sm text-slate-600"><span id="cmpL1"></span><span id="cmpL2"></span></div>
+    <button type="button" id="cmpX" class="btn-ghost" data-i18n="close"></button>
+  </dialog>
+
+<!-- Libraries: image compression & ZIP -->
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+/* ===== Interface text ===== */
+const I18N = {
+  en:{
+    title:"Compress Images", subtitle:"Reduce image size while keeping quality. Everything runs in your browser.",
+    drop1:"Drag & drop images here, or click to choose", drop2:"JPG, PNG, WebP · multiple files · paste with Ctrl+V",
+    mode:"Mode", modeQ:"Quality slider", modeT:"Target size",
+    quality:"Quality", target:"Maximum file size", custom:"or enter your own",
+    format:"Output format", fOrig:"Original",
+    compress:"Compress", again:"Compress again", running:"Processing…", clear:"Clear all",
+    download:"Download", zip:"Download all as ZIP", zipping:"Creating ZIP…", remove:"Remove",
+    waiting:"Waiting", processing:"Processing…", before:"Before", after:"After",
+    privacy:"Your images never leave this device; everything is processed locally.",
+    onlyImg:n=>n+" file(s) skipped. Only JPG, PNG and WebP are supported.",
+    invalidKb:"Target size must be at least 5 KB.",
+    libErr:"Libraries failed to load. Check your connection and reload the page.",
+    notReached:(kb,a)=>`Could not reach ${kb} KB. The smallest result was ${a}. The target may be too low for this image. Try a larger KB value, or choose WebP/JPG.`,
+    alreadySmall:"This image is already smaller than the target, so the original was kept.",
+    noGain:"Size could not be reduced with these settings, so the original was kept. Try a lower quality.",
+    pngHint:"PNG is lossless, so the quality slider barely changes its size. Choose JPG or WebP, or use Target size mode.",
+    maxDim:"Max dimension", dimOrig:"Original", keepExif:"Keep EXIF metadata (camera/location info)", compare:"Compare before/after", close:"Close",
+    err:"Error: ", total:"Total", saved:"saved", progress:(i,n,p)=>`Image ${i}/${n} · ${p}%`, doneAll:"Done"
+  }
+};
+let lang = "en"; // single language: English
+const t = (k,...a)=>{ const s=I18N[lang][k]; return typeof s==="function" ? s(...a) : s; };
+
+/* ===== State ===== */
+const $ = id => document.getElementById(id);
+const EXT = {"image/jpeg":".jpg","image/png":".png","image/webp":".webp"};
+const S = { dim:0, mode:"quality", fmt:"original", items:[], busy:false, seq:0, skipped:0 };
+
+/* ===== Small helpers ===== */
+const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function fmtSize(b){
+  if(b<1024) return b+" B";
+  if(b<1048576) return (b/1024).toFixed(1)+" KB";
+  return (b/1048576).toFixed(2)+" MB";
+}
+function download(blob,name){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+function outName(it){ // output file name: name-compressed.ext
+  const base=it.file.name.replace(/\.[^.]+$/,"");
+  return base+"-compressed"+(EXT[it.result.type]||"");
+}
+
+/* ===== Apply text ===== */
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  render();
+}
+
+/* ===== Settings controls ===== */
+function setActive(box,attr,val){
+  box.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset[attr]===String(val)));
+}
+$("modeSeg").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  S.mode=b.dataset.mode; setActive($("modeSeg"),"mode",S.mode);
+  $("qBox").hidden = S.mode!=="quality"; $("tBox").hidden = S.mode!=="target";
+  updateHint();
+};
+$("fmtSeg").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  S.fmt=b.dataset.fmt; setActive($("fmtSeg"),"fmt",S.fmt); updateHint();
+};
+$("q").oninput=()=>{ $("qOut").textContent=$("q").value+"%"; };
+$("chips").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  $("kb").value=b.dataset.kb; setActive($("chips"),"kb",b.dataset.kb);
+};
+$("kb").oninput=()=>setActive($("chips"),"kb",$("kb").value);
+
+// PNG is lossless, so the quality slider has little effect; show a warning
+function updateHint(){
+  const hasPng = S.items.some(i=>i.file.type==="image/png");
+  const show = S.mode==="quality" && (S.fmt==="image/png" || (S.fmt==="original" && hasPng));
+  $("hint").hidden=!show; $("hint").textContent=show?t("pngHint"):"";
+}
+
+/* ===== Adding files ===== */
+function addFiles(list){
+  if(S.busy) return; // no new images while processing
+  let skipped=0;
+  [...list].forEach(f=>{
+    if(!EXT[f.type]){ skipped++; return; }
+    S.items.push({id:++S.seq,file:f,url:URL.createObjectURL(f),status:"wait",result:null,note:"",noteType:""});
+  });
+  S.skipped=skipped;
+  render(); updateHint();
+}
+$("file").onchange=e=>{ addFiles(e.target.files); e.target.value=""; };
+$("drop").onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("file").click(); } };
+["dragenter","dragover"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.add("over");}));
+["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("over");}));
+$("drop").addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+
+$("clearBtn").onclick=()=>{
+  if(S.busy) return;
+  S.items.forEach(i=>URL.revokeObjectURL(i.url));
+  S.items=[]; S.skipped=0; $("prog").hidden=true; render(); updateHint();
+};
+
+/* ===== Render list ===== */
+function render(){
+  const done=S.items.filter(i=>i.status==="done");
+  const ul=$("list"); ul.innerHTML="";
+  S.items.forEach(it=>{
+    const li=document.createElement("li"); li.className="item";
+    let sizes=`${t("before")}: ${fmtSize(it.file.size)}`;
+    if(it.status==="done"){
+      const pct=Math.max(0,Math.round((1-it.result.size/it.file.size)*100));
+      sizes+=` → ${t("after")}: ${fmtSize(it.result.size)}<span class="badge">-${pct}%</span>${it.dim?` · ${it.dim}`:""}`;
+    } else if(it.status==="proc") sizes+=` · ${t("processing")}`;
+    else if(it.status==="wait") sizes+=` · ${t("waiting")}`;
+    li.innerHTML=
+      `<img src="${it.url}" alt="" ${it.status==="done"?`class="zoom" data-cmp="${it.id}"`:""}>
+       <div class="info"><div class="name">${esc(it.file.name)}</div>
+         <div class="sizes">${sizes}</div>
+         ${it.note?`<div class="note ${it.noteType}">${esc(it.note)}</div>`:""}
+       </div>
+       <div class="ibtns">
+         ${it.status==="done"?`<button type="button" data-cmp="${it.id}" title="${t("compare")}" aria-label="${t("compare")}">👁</button>`:""}
+         ${it.status==="done"&&done.length>1?`<button type="button" data-dl="${it.id}" title="${t("download")}">⬇</button>`:""}
+         ${S.busy?"":`<button type="button" data-rm="${it.id}" title="${t("remove")}" aria-label="${t("remove")}">✕</button>`}
+       </div>`;
+    ul.appendChild(li);
+  });
+  if(S.skipped) { const p=document.createElement("li"); p.className="note warn"; p.textContent=t("onlyImg",S.skipped); ul.appendChild(p); }
+
+  // Button states
+  const run=$("runBtn");
+  run.textContent = S.busy ? t("running") : (done.length ? t("again") : t("compress"));
+  run.disabled = S.busy || !S.items.length;
+  $("clearBtn").disabled = S.busy || !S.items.length;
+  $("settings").disabled = S.busy;
+
+  // Summary & download: direct download for one image, ZIP for several
+  const dl=$("dl"); dl.innerHTML=""; $("summary").textContent="";
+  if(done.length && !S.busy){
+    const a=done.reduce((s,i)=>s+i.file.size,0), b=done.reduce((s,i)=>s+i.result.size,0);
+    $("summary").textContent=`${t("total")}: ${fmtSize(a)} → ${fmtSize(b)} (${Math.max(0,Math.round((1-b/a)*100))}% ${t("saved")})`;
+    const btn=document.createElement("button"); btn.type="button"; btn.className="btn-primary";
+    if(done.length===1){
+      btn.textContent="⬇ "+t("download");
+      btn.onclick=()=>download(done[0].result,outName(done[0]));
+    } else {
+      btn.textContent="⬇ "+t("zip");
+      btn.onclick=()=>makeZip(done,btn);
+    }
+    dl.appendChild(btn);
+  }
+}
+$("list").onclick=e=>{
+  const d=e.target.closest("[data-dl]"), r=e.target.closest("[data-rm]"), c=e.target.closest("[data-cmp]");
+  if(c) openCmp(S.items.find(i=>i.id==c.dataset.cmp));
+  if(d){ const it=S.items.find(i=>i.id==d.dataset.dl); download(it.result,outName(it)); }
+  if(r && !S.busy){
+    const i=S.items.findIndex(x=>x.id==r.dataset.rm);
+    URL.revokeObjectURL(S.items[i].url); S.items.splice(i,1); render(); updateHint();
+  }
+};
+
+/* ===== ZIP creation ===== */
+async function makeZip(done,btn){
+  btn.disabled=true; btn.textContent=t("zipping");
+  const zip=new JSZip(), used={};
+  done.forEach(it=>{
+    let n=outName(it);
+    if(used[n]){ const k=++used[n]; n=n.replace(/(\.[^.]+)$/,`-${k}$1`); } else used[n]=1; // avoid duplicate names
+    zip.file(n,it.result);
+  });
+  const blob=await zip.generateAsync({type:"blob"});
+  download(blob,"compressed-images.zip");
+  render();
+}
+
+/* ===== Progress ===== */
+function setProgress(idx,total,p){ // p = current image progress, 0-100
+  const overall=Math.min(100,Math.round(((idx+p/100)/total)*100));
+  $("barFill").style.width=overall+"%";
+  $("progTxt").textContent=t("progress",Math.min(idx+1,total),total,overall);
+}
+
+/* ===== Run compression: one image at a time ===== */
+async function run(){
+  if(S.busy||!S.items.length) return;
+  if(typeof imageCompression==="undefined"){ alert(t("libErr")); return; }
+  const targetKb=parseFloat($("kb").value);
+  if(S.mode==="target" && !(targetKb>=5)){ alert(t("invalidKb")); return; }
+
+  S.busy=true; S.skipped=0;
+  S.items.forEach(i=>{i.status="wait";i.result=null;i.note="";i.noteType="";});
+  $("prog").hidden=false; setProgress(0,S.items.length,0); render();
+
+  const total=S.items.length;
+  for(let idx=0; idx<total; idx++){
+    const it=S.items[idx];
+    it.status="proc"; render();
+    // output format: if "Original", use the image's own type
+    const type = S.fmt==="original" ? it.file.type : S.fmt;
+    const opts={
+      fileType:type, useWebWorker:true,
+      preserveExif:$("exif").checked,        // keep/strip EXIF
+      maxWidthOrHeight:S.dim||undefined,     // max pixels (0 = original)
+      onProgress:p=>setProgress(idx,total,p)
+    };
+    if(S.mode==="quality"){
+      opts.initialQuality=$("q").value/100;     // quality mode
+      opts.maxSizeMB=Number.POSITIVE_INFINITY;  // no size limit
+      opts.alwaysKeepResolution=true;           // keep resolution unchanged
+    } else {
+      opts.maxSizeMB=targetKb/1024;             // target size mode (in MB)
+      opts.maxIteration=20;                     // try more iterations to reach the target
+      opts.initialQuality=0.9;
+    }
+    try{
+      const out=await imageCompression(it.file,opts);
+      const sameType = out.type===it.file.type;
+      if(out.size>=it.file.size && sameType){
+        // no reduction: keep the original
+        it.result=it.file;
+        it.note = S.mode==="target" && it.file.size<=targetKb*1024 ? t("alreadySmall") : t("noGain");
+        it.noteType="warn";
+      } else {
+        it.result=out;
+        if(S.mode==="target" && out.size>targetKb*1024){ // target not reached: tell the user
+          it.note=t("notReached",targetKb,fmtSize(out.size)); it.noteType="warn";
+        }
+      }
+      // store before/after dimensions (pixels)
+      try{ const a=await createImageBitmap(it.file), b=await createImageBitmap(it.result);
+           it.dim=`${a.width}×${a.height} → ${b.width}×${b.height}`; a.close(); b.close(); }catch(e){}
+      it.status="done";
+    }catch(err){
+      it.status="err"; it.note=t("err")+(err&&err.message||err); it.noteType="err";
+    }
+    setProgress(idx+1,total,0);
+    render();
+  }
+  S.busy=false;
+  $("progTxt").textContent=t("doneAll")+" · 100%";
+  render();
+}
+$("runBtn").onclick=run;
+
+/* ===== Resize (max pixels) ===== */
+$("dimSeg").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  S.dim=+b.dataset.dim; setActive($("dimSeg"),"dim",S.dim);
+};
+
+/* ===== Remember settings (localStorage) ===== */
+function saveSet(){
+  try{ localStorage.setItem("ci-set",JSON.stringify({mode:S.mode,fmt:S.fmt,dim:S.dim,
+    q:$("q").value,kb:$("kb").value,exif:$("exif").checked})); }catch(e){}
+}
+["click","input"].forEach(ev=>$("settings").addEventListener(ev,saveSet));
+try{
+  const s=JSON.parse(localStorage.getItem("ci-set")||"null");
+  if(s){
+    $("q").value=s.q; $("q").oninput(); $("kb").value=s.kb; $("kb").oninput();
+    $("exif").checked=!!s.exif;
+    ["mode","fmt","dim"].forEach(k=>{
+      const b=document.querySelector(`[data-${k}="${s[k]}"]`); if(b) b.click();
+    });
+  }
+}catch(e){}
+
+/* ===== Paste images from the clipboard with Ctrl+V ===== */
+document.addEventListener("paste",e=>{
+  const fs=[...(e.clipboardData&&e.clipboardData.files||[])];
+  if(fs.length) addFiles(fs);
+});
+
+/* ===== Before/after comparison (slider) ===== */
+function openCmp(it){
+  $("cmpA").src=it.url; $("cmpB").src=URL.createObjectURL(it.result);
+  $("cmpL1").textContent=`${t("before")}: ${fmtSize(it.file.size)}`;
+  $("cmpL2").textContent=`${t("after")}: ${fmtSize(it.result.size)}`;
+  $("cmpR").value=50; $("cmpR").oninput(); $("cmp").showModal();
+}
+$("cmpR").oninput=()=>{ $("cmpB").style.clipPath=`inset(0 0 0 ${$("cmpR").value}%)`; }; // right side = compressed
+$("cmpX").onclick=()=>$("cmp").close();
+$("cmp").addEventListener("click",e=>{ if(e.target===$("cmp")) $("cmp").close(); });
+$("cmp").addEventListener("close",()=>URL.revokeObjectURL($("cmpB").src));
+
+applyLang();
+</script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

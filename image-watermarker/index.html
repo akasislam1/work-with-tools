@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Watermarker – Add Text or Logo Watermark Online | Work With Tools</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Dancing+Script:wght@700&family=Inter:wght@700&family=Lobster&family=Montserrat:wght@700&family=Oswald:wght@700&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@700&family=Roboto:wght@700&family=Roboto+Mono:wght@700&family=Sacramento&display=swap">
+<style type="text/tailwindcss">
+  @layer components {
+    .sec { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
+    .sec > summary { @apply flex cursor-pointer select-none items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800; }
+    .sec-body { @apply space-y-3 border-t border-slate-100 px-4 py-4; }
+    .row { @apply grid grid-cols-[6.25rem_1fr_3.25rem] items-center gap-x-3 sm:grid-cols-[8rem_1fr_3.5rem]; }
+    .row2 { @apply grid grid-cols-[6.25rem_1fr] items-center gap-x-3 sm:grid-cols-[8rem_1fr]; }
+    .lbl { @apply text-sm leading-tight text-slate-600; }
+    .val { @apply text-right text-sm tabular-nums text-slate-500; }
+    .rng { @apply h-2 w-full cursor-pointer accent-indigo-600; }
+    .fld { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200; }
+    .num { @apply w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-right text-sm tabular-nums focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200; }
+    .sub { @apply pt-1 text-xs font-semibold uppercase tracking-wide text-slate-400; }
+    .btn-primary { @apply w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-progress disabled:opacity-60; }
+    .btn-ghost { @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50; }
+    .seg { @apply flex rounded-xl bg-slate-100 p-1; }
+    .seg > label { @apply flex-1; }
+    .seg span { @apply block cursor-pointer rounded-lg px-3 py-1.5 text-center text-sm font-medium text-slate-600 transition; }
+  }
+</style>
+<style>
+  [hidden] { display: none !important; }
+  summary::-webkit-details-marker { display: none; }
+  .seg input:checked + span { background: #fff; color: #4338ca; box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+  .seg input:focus-visible + span { outline: 2px solid #a5b4fc; }
+  .off { opacity: .5; pointer-events: none; }
+  #canvas { touch-action: none; cursor: grab; }
+  #canvas:active { cursor: grabbing; }
+</style>
+<meta name="description" content="Add a text or logo watermark to your photos. Position, resize and export a whole batch as a ZIP. Free and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Image Watermarker – Add Text or Logo Watermark Online">
+<meta property="og:description" content="Add a text or logo watermark to your photos. Position, resize and export a whole batch as a ZIP. Free and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+
+  <header class="mx-auto max-w-6xl px-4 pb-3 pt-6">
+    <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Image Watermarker</h1>
+    <p class="mt-1 text-sm text-slate-500">Add a text or logo watermark, transform it, and export a whole batch as a ZIP.</p>
+  </header>
+
+  <section class="mx-auto max-w-6xl px-4 pb-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <label for="fileInput" class="mb-2 block text-sm font-semibold">Base image(s)</label>
+      <input type="file" id="fileInput" accept="image/*" multiple
+        class="block w-full text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-indigo-500">
+      <p class="mt-2 text-xs text-slate-400">Multiple allowed. You can also drop files onto the preview, or click the preview area to browse.</p>
+    </div>
+  </section>
+
+  <main class="mx-auto max-w-6xl px-4 pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-start lg:gap-6">
+
+    <!-- Preview: stays pinned while you edit -->
+    <section id="previewCol" class="sticky top-0 z-30 -mx-4 bg-slate-50/90 px-4 py-2 backdrop-blur lg:top-6 lg:mx-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+      <div id="previewCard" class="rounded-2xl border border-slate-200 bg-white p-2 shadow-md transition lg:p-3 lg:shadow-sm">
+        <div class="relative grid min-h-[8rem] place-items-center overflow-hidden rounded-xl bg-slate-100 p-2">
+          <canvas id="canvas" width="600" height="400"
+            class="h-auto max-h-[30vh] w-auto max-w-full rounded-md bg-white shadow sm:max-h-[40vh] lg:max-h-[70vh]"></canvas>
+          <div id="emptyState" role="button" tabindex="0" aria-label="Choose images or drop them here" class="absolute inset-2 grid cursor-pointer place-items-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-100/95 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400">
+            <div class="text-slate-400">
+              <svg class="mx-auto h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.16-5.16a2.25 2.25 0 013.18 0l5.16 5.16m-1.5-1.5l1.41-1.41a2.25 2.25 0 013.18 0l2.25 2.25M3.75 19.5h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zM9.75 8.25h.008v.008H9.75V8.25z"/></svg>
+              <p class="mt-2 text-sm font-medium text-slate-500">Drop images here</p>
+              <p class="text-xs">or click to choose files</p>
+            </div>
+          </div>
+        </div>
+        <p id="info" class="mt-2 line-clamp-2 px-1 text-center text-xs text-slate-500">Choose one or more images</p>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <div id="controls" class="off mt-2 space-y-3 lg:mt-0">
+
+      <details class="sec group" open>
+        <summary>Canvas
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="row2">
+            <label class="lbl" for="preset">Size preset</label>
+            <select id="preset" class="fld">
+              <option value="original">Original size (each image)</option>
+              <option value="1080x1080">Instagram post – Square (1080×1080)</option>
+              <option value="1080x1350">Instagram post – Portrait (1080×1350)</option>
+              <option value="1080x1920">Instagram / Facebook Story, Reels (1080×1920)</option>
+              <option value="1200x630">Facebook share (1200×630)</option>
+              <option value="1600x900">X (Twitter) post (1600×900)</option>
+              <option value="1200x627">LinkedIn post (1200×627)</option>
+              <option value="1280x720">YouTube thumbnail (1280×720)</option>
+              <option value="1000x1500">Pinterest pin (1000×1500)</option>
+            </select>
+          </div>
+          <div class="row2">
+            <label class="lbl" for="fit">Image fit</label>
+            <select id="fit" class="fld">
+              <option value="contain">Fit whole image (may leave empty space)</option>
+              <option value="cover">Fill canvas (edges may be cropped)</option>
+            </select>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group" open>
+        <summary>Watermark
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="seg">
+            <label><input type="radio" name="wmMode" value="text" checked class="sr-only"><span>Text</span></label>
+            <label><input type="radio" name="wmMode" value="logo" class="sr-only"><span>Logo</span></label>
+          </div>
+
+          <div id="textGroup" class="space-y-3">
+            <div class="row2">
+              <label class="lbl" for="wmText">Text</label>
+              <input type="text" id="wmText" value="© My Watermark" class="fld">
+            </div>
+            <div class="row2">
+              <label class="lbl" for="fontSel">Font</label>
+              <div class="flex items-center gap-2">
+                <select id="fontSel" class="fld min-w-0 flex-1"></select>
+                <span id="fontPreview" class="w-11 shrink-0 text-center text-2xl leading-none text-slate-700" aria-hidden="true">Ag</span>
+              </div>
+            </div>
+            <div class="row2">
+              <label class="lbl" for="textColor">Color</label>
+              <div class="flex items-center gap-4">
+                <input type="color" id="textColor" value="#ffffff" class="h-9 w-14 cursor-pointer rounded-lg border border-slate-300 bg-white p-1">
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+                  <input type="checkbox" id="textOutline" checked class="h-4 w-4 rounded accent-indigo-600"> Outline
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <label class="lbl" for="wmSize">Size</label>
+              <input class="rng" type="range" id="wmSize" min="10" max="120" value="40">
+              <output class="val" id="wmSizeOut">40</output>
+            </div>
+          </div>
+
+          <div id="logoGroup" class="space-y-3" hidden>
+            <div class="row2">
+              <label class="lbl" for="logoInput">Logo</label>
+              <input type="file" id="logoInput" accept="image/*"
+                class="block w-full text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-700">
+            </div>
+            <div class="row">
+              <label class="lbl" for="logoSize">Size (%)</label>
+              <input class="rng" type="range" id="logoSize" min="5" max="80" value="25">
+              <output class="val" id="logoSizeOut">25</output>
+            </div>
+          </div>
+
+          <div class="row">
+            <label class="lbl" for="wmX">Horizontal (X)</label>
+            <input class="rng" type="range" id="wmX" min="0" max="100" value="50">
+            <output class="val" id="wmXOut">50</output>
+          </div>
+          <div class="row">
+            <label class="lbl" for="wmY">Vertical (Y)</label>
+            <input class="rng" type="range" id="wmY" min="0" max="100" value="90">
+            <output class="val" id="wmYOut">90</output>
+          </div>
+          <div class="row">
+            <label class="lbl" for="wmOpacity">Opacity</label>
+            <input class="rng" type="range" id="wmOpacity" min="0" max="100" value="50">
+            <output class="val" id="wmOpacityOut">50</output>
+          </div>
+
+          <div class="space-y-1.5">
+            <span class="lbl">Tile</span>
+            <div class="seg">
+              <label><input type="radio" name="tileMode" value="single" checked class="sr-only"><span><svg viewBox="0 0 20 20" fill="currentColor" class="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" aria-hidden="true"><circle cx="10" cy="10" r="2.6"/></svg>Single</span></label>
+              <label><input type="radio" name="tileMode" value="grid" class="sr-only"><span><svg viewBox="0 0 20 20" fill="currentColor" class="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" aria-hidden="true"><circle cx="5" cy="5" r="2.4"/><circle cx="15" cy="5" r="2.4"/><circle cx="5" cy="15" r="2.4"/><circle cx="15" cy="15" r="2.4"/></svg>Grid</span></label>
+              <label><input type="radio" name="tileMode" value="stagger" class="sr-only"><span><svg viewBox="0 0 20 20" fill="currentColor" class="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" aria-hidden="true"><circle cx="5" cy="5" r="2.2"/><circle cx="15" cy="5" r="2.2"/><circle cx="10" cy="10" r="2.2"/><circle cx="5" cy="15" r="2.2"/><circle cx="15" cy="15" r="2.2"/></svg>Staggered</span></label>
+            </div>
+          </div>
+          <div class="row" id="tileGapRow" hidden>
+            <label class="lbl" for="tileGap">Spacing (%)</label>
+            <input class="rng" type="range" id="tileGap" min="-40" max="200" value="40">
+            <output class="val" id="tileGapOut">40</output>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group" open>
+        <summary>2D rotation &amp; shear
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="row">
+            <label class="lbl" for="rot">Rotation (°)</label>
+            <input class="rng" type="range" id="rot" min="-180" max="180" step="1" value="0">
+            <input class="num" type="number" id="rotNum" step="0.1" value="0" aria-label="Precise rotation (degrees)">
+          </div>
+          <div class="row2">
+            <span class="lbl">Drag on canvas</span>
+            <div class="seg">
+              <label><input type="radio" name="dragMode" value="move" checked class="sr-only"><span>Move</span></label>
+              <label><input type="radio" name="dragMode" value="rotate" class="sr-only"><span>Free rotate</span></label>
+            </div>
+          </div>
+          <div class="row">
+            <label class="lbl" for="shearX">Shear X (°)</label>
+            <input class="rng" type="range" id="shearX" min="-60" max="60" value="0">
+            <output class="val" id="shearXOut">0</output>
+          </div>
+          <div class="row">
+            <label class="lbl" for="shearY">Shear Y (°)</label>
+            <input class="rng" type="range" id="shearY" min="-60" max="60" value="0">
+            <output class="val" id="shearYOut">0</output>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group">
+        <summary>3D rotation
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="row">
+            <label class="lbl" for="rotX">X axis (°)</label>
+            <input class="rng" type="range" id="rotX" min="-80" max="80" value="0">
+            <output class="val" id="rotXOut">0</output>
+          </div>
+          <div class="row">
+            <label class="lbl" for="rotY">Y axis (°)</label>
+            <input class="rng" type="range" id="rotY" min="-80" max="80" value="0">
+            <output class="val" id="rotYOut">0</output>
+          </div>
+          <div class="row">
+            <label class="lbl" for="persp">Perspective</label>
+            <input class="rng" type="range" id="persp" min="0" max="100" value="50">
+            <output class="val" id="perspOut">50</output>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group">
+        <summary>Extrude &amp; bevel
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="row">
+            <label class="lbl" for="extDepth">Extrude depth</label>
+            <input class="rng" type="range" id="extDepth" min="0" max="40" value="0">
+            <output class="val" id="extDepthOut">0</output>
+          </div>
+          <div class="row">
+            <label class="lbl" for="extAngle">Extrude direction (°)</label>
+            <input class="rng" type="range" id="extAngle" min="0" max="360" value="45">
+            <output class="val" id="extAngleOut">45</output>
+          </div>
+          <div class="row2">
+            <label class="lbl" for="extColor">Extrude color</label>
+            <input type="color" id="extColor" value="#444444" class="h-9 w-14 cursor-pointer rounded-lg border border-slate-300 bg-white p-1">
+          </div>
+          <div class="row">
+            <label class="lbl" for="bevel">Bevel</label>
+            <input class="rng" type="range" id="bevel" min="0" max="10" value="0">
+            <output class="val" id="bevelOut">0</output>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group">
+        <summary>Revolve &amp; inflate
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <p class="sub">Revolve (wrap around a cylinder)</p>
+          <div class="row">
+            <label class="lbl" for="revSweep">Revolve angle (°)</label>
+            <input class="rng" type="range" id="revSweep" min="0" max="180" value="0">
+            <output class="val" id="revSweepOut">0</output>
+          </div>
+          <div class="row2">
+            <label class="lbl" for="revAxis">Axis</label>
+            <select id="revAxis" class="fld">
+              <option value="v">Vertical axis (curves left–right)</option>
+              <option value="h">Horizontal axis (curves up–down)</option>
+            </select>
+          </div>
+          <p class="sub pt-2">Inflate</p>
+          <div class="row">
+            <label class="lbl" for="inflate">Inflate / Pinch</label>
+            <input class="rng" type="range" id="inflate" min="-80" max="100" value="0">
+            <output class="val" id="inflateOut">0</output>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec group" open>
+        <summary>Download settings
+          <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </summary>
+        <div class="sec-body">
+          <div class="row2">
+            <label class="lbl" for="outFormat">File format</label>
+            <select id="outFormat" class="fld">
+              <option value="original">Original format</option>
+              <option value="jpeg-std">Convert to JPEG (standard quality, normal file size)</option>
+              <option value="jpeg-max">Convert to JPEG (maximum quality, large file size)</option>
+              <option value="jpeg-small">Convert to JPEG and compress (standard quality, small file size)</option>
+              <option value="png">Convert to PNG (maximum quality, large file size)</option>
+              <option value="webp-std">Convert to WEBP (standard quality, small file size)</option>
+              <option value="webp-max">Convert to WEBP (maximum quality, large file size)</option>
+            </select>
+          </div>
+          <div class="row2">
+            <label class="lbl" for="rsMode">Resize images</label>
+            <select id="rsMode" class="fld">
+              <option value="none">Do not resize</option>
+              <option value="width">Exact width</option>
+              <option value="height">Exact height</option>
+              <option value="both">Exact width &amp; height</option>
+              <option value="notLarger">Not larger than</option>
+              <option value="notSmaller">Not smaller than</option>
+              <option value="percent">Percentage</option>
+              <option value="filesize">Specific file size</option>
+            </select>
+          </div>
+          <div class="row2" id="rsWRow" hidden>
+            <label class="lbl" for="rsW">Width (px)</label>
+            <input type="number" id="rsW" min="1" step="1" value="1920" class="fld">
+          </div>
+          <div class="row2" id="rsHRow" hidden>
+            <label class="lbl" for="rsH">Height (px)</label>
+            <input type="number" id="rsH" min="1" step="1" value="1080" class="fld">
+          </div>
+          <div class="row2" id="rsPctRow" hidden>
+            <label class="lbl" for="rsPct">Percentage (%)</label>
+            <input type="number" id="rsPct" min="1" step="1" value="50" class="fld">
+          </div>
+          <div class="row2" id="rsKBRow" hidden>
+            <label class="lbl" for="rsKB">Max size (KB)</label>
+            <input type="number" id="rsKB" min="1" step="1" value="500" class="fld">
+          </div>
+          <p id="rsHint" class="text-xs leading-snug text-slate-400"></p>
+          <p id="outInfo" class="text-xs font-medium text-slate-500"></p>
+        </div>
+      </details>
+
+      <div class="sec space-y-3 p-4">
+        <button type="button" id="resetFx" class="btn-ghost">Reset transforms</button>
+        <button type="button" id="zipBtn" class="btn-primary">Process all images &amp; download ZIP</button>
+        <div id="progressWrap" hidden>
+          <div class="h-2 overflow-hidden rounded-full bg-slate-200">
+            <div id="progressBar" class="h-full w-0 rounded-full bg-indigo-600 transition-[width] duration-200"></div>
+          </div>
+          <p id="progressText" class="mt-1.5 text-center text-xs text-slate-500" hidden></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('canvas');
+  const ctx = canvas.getContext('2d');
+  const info = $('info');
+  const controls = $('controls');
+
+  const fileInput = $('fileInput'), logoInput = $('logoInput');
+  const wmText = $('wmText'), wmSize = $('wmSize'), logoSize = $('logoSize');
+  const wmX = $('wmX'), wmY = $('wmY'), wmOpacity = $('wmOpacity');
+  const preset = $('preset'), fit = $('fit');
+  const textGroup = $('textGroup'), logoGroup = $('logoGroup');
+  const zipBtn = $('zipBtn'), progressText = $('progressText');
+  const progressWrap = $('progressWrap'), progressBar = $('progressBar');
+  const progress = (() => {
+    let max = 1, value = 0;
+    const paint = () => { progressBar.style.width = (max ? Math.min(100, value / max * 100) : 0) + '%'; };
+    return {
+      set hidden(v) { progressWrap.hidden = v; },
+      set max(v) { max = v; paint(); },
+      set value(v) { value = v; paint(); },
+    };
+  })();
+
+  const rot = $('rot'), rotNum = $('rotNum'), shearX = $('shearX'), shearY = $('shearY');
+  const rotX = $('rotX'), rotY = $('rotY'), persp = $('persp');
+  const extDepth = $('extDepth'), extAngle = $('extAngle'), extColor = $('extColor'), bevel = $('bevel');
+  const revSweep = $('revSweep'), revAxis = $('revAxis'), inflate = $('inflate');
+  const fontSel = $('fontSel'), fontPreview = $('fontPreview'), textColor = $('textColor'), textOutline = $('textOutline');
+  const outFormat = $('outFormat'), rsMode = $('rsMode'), rsW = $('rsW'), rsH = $('rsH'), rsPct = $('rsPct'), rsKB = $('rsKB');
+  const outInfo = $('outInfo'), tileGap = $('tileGap');
+
+  let files = [];
+  let currentImg = null;
+  let logoImg = null;
+  let infoText = '';
+
+  const mode = () => document.querySelector('input[name="wmMode"]:checked').value;
+  const dragMode = () => document.querySelector('input[name="dragMode"]:checked').value;
+  const getRot = () => parseFloat(rotNum.value) || 0;
+  const DEG = Math.PI / 180;
+
+  function setInfo(text) { infoText = text; info.textContent = text; }
+
+  function loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load failed')); };
+      img.src = url;
+    });
+  }
+
+  async function loadBitmap(file) {
+    if (window.createImageBitmap) {
+      try { return await createImageBitmap(file); } catch { /* fall back below */ }
+    }
+    return loadImage(file);
+  }
+
+  /* ---------- স্ক্র্যাচ ক্যানভাস (বারবার নতুন বানানো এড়াতে) ---------- */
+  const scratch = {};
+  function getCanvas(name, w, h) {
+    let c = scratch[name];
+    if (!c) c = scratch[name] = document.createElement('canvas');
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    else c.getContext('2d').clearRect(0, 0, w, h);
+    return c;
+  }
+
+  /* ---------- ধাপ ১: টেক্সট/লোগো থেকে স্প্রাইট ---------- */
+  function buildSprite(cvw, k) {
+    if (mode() === 'text') {
+      const text = wmText.value;
+      if (!text) return null;
+      const fs = wmSize.value * k;
+      const f = currentFont();
+      const font = `${f.weight} ${fs}px ${f.css}`;
+      const outline = textOutline.checked;
+      const m = getCanvas('measure', 1, 1).getContext('2d');
+      m.font = font;
+      const tw = m.measureText(text).width;
+      const lw = outline ? Math.max(2, fs / 14) : 0;
+      const pad = Math.ceil(lw * 2 + fs * 0.3 + 2);
+      const w = Math.ceil(tw + pad * 2), h = Math.ceil(fs * 1.5 + pad * 2);
+      const s = getCanvas('spr0', w, h);
+      const c = s.getContext('2d');
+      c.font = font; c.textAlign = 'center'; c.textBaseline = 'middle';
+      if (outline) {
+        c.lineWidth = lw; c.lineJoin = 'round'; c.strokeStyle = contrastColor(textColor.value);
+        c.strokeText(text, w / 2, h / 2);
+      }
+      c.fillStyle = textColor.value;
+      c.fillText(text, w / 2, h / 2);
+      return s;
+    }
+    if (!logoImg) return null;
+    const lw = Math.max(2, Math.round(cvw * logoSize.value / 100));
+    const lh = Math.max(2, Math.round(lw * logoImg.height / logoImg.width));
+    const s = getCanvas('spr0', lw, lh);
+    s.getContext('2d').drawImage(logoImg, 0, 0, lw, lh);
+    return s;
+  }
+
+  /* ---------- ধাপ ২: Revolve (wrap around a cylinder) ---------- */
+  function* applyRevolve(s) {
+    const A = +revSweep.value;
+    if (A <= 0) return s;
+    const w = s.width, h = s.height;
+    const d = getCanvas('spr1', w, h);
+    const c = d.getContext('2d');
+    const half = A * DEG / 2;
+    const sinH = Math.sin(half);
+    const vertical = revAxis.value === 'v';
+    const n = vertical ? w : h;
+    const map = (t) => {
+      const xn = (t - 0.5) * 2;
+      const th = Math.asin(Math.max(-1, Math.min(1, xn * sinH)));
+      return th / half * 0.5 + 0.5;
+    };
+    let t0 = performance.now();
+    for (let i = 0; i < n; i++) {
+      if (performance.now() - t0 > SLICE_MS) { yield; t0 = performance.now(); }
+      const u0 = map(i / n), u1 = map((i + 1) / n);
+      if (vertical) {
+        const sx = u0 * w;
+        const sw = Math.min(Math.max(1, (u1 - u0) * w), w - sx);
+        if (sw > 0) c.drawImage(s, sx, 0, sw, h, i, 0, 1, h);
+      } else {
+        const sy = u0 * h;
+        const sh = Math.min(Math.max(1, (u1 - u0) * h), h - sy);
+        if (sh > 0) c.drawImage(s, 0, sy, w, sh, 0, i, w, 1);
+      }
+    }
+    // কিনারার দিকে হালকা ছায়া, যাতে বাঁকা ভাব আসে
+    const g = vertical ? c.createLinearGradient(0, 0, w, 0) : c.createLinearGradient(0, 0, 0, h);
+    const a = 0.55 * (A / 180);
+    g.addColorStop(0, `rgba(0,0,0,${a})`);
+    g.addColorStop(0.5, 'rgba(0,0,0,0)');
+    g.addColorStop(1, `rgba(0,0,0,${a})`);
+    c.globalCompositeOperation = 'source-atop';
+    c.fillStyle = g;
+    c.fillRect(0, 0, w, h);
+    c.globalCompositeOperation = 'source-over';
+    return d;
+  }
+
+  /* ---------- ধাপ ৩: Inflate / Pinch (মাঝখান ফোলানো বা চাপা) ---------- */
+  function* applyInflate(s) {
+    const st = +inflate.value;
+    if (!st) return s;
+    const amt = st > 0 ? st / 100 * 1.5 : st / 100 * 0.8;
+    const w = s.width, h = s.height;
+    const src = s.getContext('2d').getImageData(0, 0, w, h).data;
+    const d = getCanvas('spr2', w, h);
+    const dc = d.getContext('2d');
+    const out = dc.createImageData(w, h);
+    const o = out.data;
+    const hw = w / 2, hh = h / 2;
+    let t0 = performance.now();
+    for (let j = 0; j < h; j++) {
+      if (performance.now() - t0 > SLICE_MS) { yield; t0 = performance.now(); }
+      for (let i = 0; i < w; i++) {
+        const q = (j * w + i) * 4;
+        const nx = (i + 0.5 - hw) / hw, ny = (j + 0.5 - hh) / hh;
+        const r = Math.hypot(nx, ny);
+        if (r >= 1 || r === 0) {
+          o[q] = src[q]; o[q + 1] = src[q + 1]; o[q + 2] = src[q + 2]; o[q + 3] = src[q + 3];
+          continue;
+        }
+        const ratio = Math.pow(r, amt);
+        const sx = hw + nx * ratio * hw - 0.5;
+        const sy = hh + ny * ratio * hh - 0.5;
+        const x0 = Math.floor(sx), y0 = Math.floor(sy);
+        const fx = sx - x0, fy = sy - y0;
+        let rr = 0, gg = 0, bb = 0, aa = 0;
+        for (let m = 0; m < 4; m++) {
+          const xx = x0 + (m & 1), yy = y0 + (m >> 1);
+          if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+          const wt = ((m & 1) ? fx : 1 - fx) * ((m >> 1) ? fy : 1 - fy);
+          const p = (yy * w + xx) * 4;
+          const al = src[p + 3] * wt;
+          rr += src[p] * al; gg += src[p + 1] * al; bb += src[p + 2] * al; aa += al;
+        }
+        if (aa > 0) { o[q] = rr / aa; o[q + 1] = gg / aa; o[q + 2] = bb / aa; o[q + 3] = aa; }
+      }
+    }
+    dc.putImageData(out, 0, 0);
+    return d;
+  }
+
+  /* ---------- ধাপ ৪: ২D (ঘূর্ণন, শিয়ার) ও ৩D (পার্সপেক্টিভ) ---------- */
+  function tri(c, img, S, D) {
+    const [s0, s1, s2] = S, [d0, d1, d2] = D;
+    const ux1 = s1[0] - s0[0], uy1 = s1[1] - s0[1], ux2 = s2[0] - s0[0], uy2 = s2[1] - s0[1];
+    const det = ux1 * uy2 - ux2 * uy1;
+    if (Math.abs(det) < 1e-9) return;
+    const vx1 = d1[0] - d0[0], vy1 = d1[1] - d0[1], vx2 = d2[0] - d0[0], vy2 = d2[1] - d0[1];
+    const a = (vx1 * uy2 - vx2 * uy1) / det, cc = (ux1 * vx2 - ux2 * vx1) / det;
+    const b = (vy1 * uy2 - vy2 * uy1) / det, d = (ux1 * vy2 - ux2 * vy1) / det;
+    const e = d0[0] - a * s0[0] - cc * s0[1], f = d0[1] - b * s0[0] - d * s0[1];
+    const g = [(d0[0] + d1[0] + d2[0]) / 3, (d0[1] + d1[1] + d2[1]) / 3];
+    const ex = (p) => {
+      const dx = p[0] - g[0], dy = p[1] - g[1], l = Math.hypot(dx, dy) || 1;
+      return [p[0] + dx / l * 0.8, p[1] + dy / l * 0.8];
+    };
+    const p0 = ex(d0), p1 = ex(d1), p2 = ex(d2);
+    c.save();
+    c.beginPath();
+    c.moveTo(p0[0], p0[1]); c.lineTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]);
+    c.closePath();
+    c.clip();
+    c.transform(a, b, cc, d, e, f);
+    c.drawImage(img, 0, 0);
+    c.restore();
+  }
+
+  function drawMesh(c, s, rx, ry) {
+    const w = s.width, h = s.height, N = 14;
+    const f = Math.max(w, h) * (3 - persp.value / 100 * 2.2);
+    const cx = Math.cos(rx), sx = Math.sin(rx), cy = Math.cos(ry), sy = Math.sin(ry);
+    const pts = [];
+    for (let j = 0; j <= N; j++) {
+      const row = [];
+      for (let i = 0; i <= N; i++) {
+        const lx = (i / N - 0.5) * w, ly = (j / N - 0.5) * h;
+        const x1 = lx * cy, y1 = ly, z1 = -lx * sy;
+        const y2 = y1 * cx - z1 * sx, z2 = y1 * sx + z1 * cx;
+        const sc = f / Math.max(f - z2, f * 0.1);
+        row.push([x1 * sc, y2 * sc]);
+      }
+      pts.push(row);
+    }
+    for (let j = 0; j < N; j++) {
+      for (let i = 0; i < N; i++) {
+        const s00 = [i * w / N, j * h / N], s10 = [(i + 1) * w / N, j * h / N];
+        const s01 = [i * w / N, (j + 1) * h / N], s11 = [(i + 1) * w / N, (j + 1) * h / N];
+        const d00 = pts[j][i], d10 = pts[j][i + 1], d01 = pts[j + 1][i], d11 = pts[j + 1][i + 1];
+        tri(c, s, [s00, s10, s01], [d00, d10, d01]);
+        tri(c, s, [s10, s11, s01], [d10, d11, d01]);
+      }
+    }
+  }
+
+  function transformPass(cvw, cvh, sprite, x, y) {
+    const T = getCanvas('T', cvw, cvh);
+    const c = T.getContext('2d');
+    const shx = Math.tan(+shearX.value * DEG), shy = Math.tan(+shearY.value * DEG);
+    const rx = +rotX.value * DEG, ry = +rotY.value * DEG;
+    c.save();
+    c.translate(x, y);
+    c.rotate(getRot() * DEG);
+    c.transform(1, shy, shx, 1, 0, 0);
+    if (rx === 0 && ry === 0) c.drawImage(sprite, -sprite.width / 2, -sprite.height / 2);
+    else drawMesh(c, sprite, rx, ry);
+    c.restore();
+    return T;
+  }
+
+  /* ---------- ধাপ ৫: এক্সট্রুড ও বেভেল ---------- */
+  function tint(name, src, color) {
+    const t = getCanvas(name, src.width, src.height);
+    const c = t.getContext('2d');
+    c.drawImage(src, 0, 0);
+    c.globalCompositeOperation = 'source-in';
+    c.fillStyle = color;
+    c.fillRect(0, 0, t.width, t.height);
+    c.globalCompositeOperation = 'source-over';
+    return t;
+  }
+
+  function* composeWatermark(T, cvw, cvh, k) {
+    const depth = +extDepth.value * k, bev = +bevel.value * k;
+    if (depth <= 0 && bev <= 0) return T;
+    const W = getCanvas('W', cvw, cvh);
+    const c = W.getContext('2d');
+    if (depth > 0) {
+      const side = tint('side', T, extColor.value);
+      const a = +extAngle.value * DEG;
+      const dx = Math.cos(a), dy = Math.sin(a);
+      const steps = Math.max(1, Math.ceil(depth));
+      const step = depth / steps;
+      let t0 = performance.now();
+      for (let n = steps; n >= 1; n--) {
+        c.drawImage(side, dx * step * n, dy * step * n);
+        if (performance.now() - t0 > SLICE_MS) { yield; t0 = performance.now(); }
+      }
+    }
+    if (bev > 0) {
+      const lo = tint('lo', T, '#000'), hi = tint('hi', T, '#fff');
+      c.globalAlpha = 0.55; c.drawImage(lo, bev, bev);
+      c.globalAlpha = 0.8; c.drawImage(hi, -bev, -bev);
+      c.globalAlpha = 1;
+    }
+    c.drawImage(T, 0, 0);
+    return W;
+  }
+
+  /* ---------- মূল রেন্ডার (প্রিভিউ ও ব্যাচ দুটোতেই) ---------- */
+  /* ---------- Cooperative scheduling: keeps the browser responsive on big images ---------- */
+  const SLICE_MS = 30;                 // max work per slice before giving control back
+  let busy = false;                    // true while a batch is running
+
+  // paint-friendly pause (falls back to a plain timer in background tabs)
+  const pause = () => new Promise((r) =>
+    document.hidden ? setTimeout(r, 0) : requestAnimationFrame(() => setTimeout(r, 0)));
+
+  function runSync(gen) {              // preview: run everything at once
+    let r;
+    while (!(r = gen.next()).done) { /* ignore yields */ }
+    return r.value;
+  }
+  async function runAsync(gen) {       // batch: pause whenever a slice has used up its time
+    let last = performance.now(), r;
+    while (!(r = gen.next()).done) {
+      if (performance.now() - last > SLICE_MS - 6) { await pause(); last = performance.now(); }
+    }
+    return r.value;
+  }
+
+  function* renderGen(cv, img) {
+    const c = cv.getContext('2d');
+    c.clearRect(0, 0, cv.width, cv.height);
+    c.fillStyle = '#fff';
+    c.fillRect(0, 0, cv.width, cv.height);
+
+    const ratios = [cv.width / img.width, cv.height / img.height];
+    const scale = fit.value === 'cover' ? Math.max(...ratios) : Math.min(...ratios);
+    const w = img.width * scale, h = img.height * scale;
+    c.drawImage(img, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+    yield;
+
+    const x = cv.width * wmX.value / 100;
+    const y = cv.height * wmY.value / 100;
+    const k = cv.width / 600;
+
+    let spr = buildSprite(cv.width, k);
+    if (!spr) return;
+    spr = yield* applyRevolve(spr);
+    spr = yield* applyInflate(spr);
+    yield;
+    yield* drawWatermark(c, cv, spr, x, y, k);
+  }
+
+  // single watermark, or one "stamp" repeated on a (rotated) grid / staggered lattice
+  function* drawWatermark(c, cv, spr, x, y, k) {
+    const tile = tileMode();
+    const opacity = wmOpacity.value / 100;
+
+    if (tile === 'single') {
+      const T = transformPass(cv.width, cv.height, spr, x, y);
+      yield;
+      const Wm = yield* composeWatermark(T, cv.width, cv.height, k);
+      c.save();
+      c.globalAlpha = opacity;
+      c.drawImage(Wm, 0, 0);
+      c.restore();
+      return;
+    }
+
+    // 1) render one watermark at the canvas centre and crop it to its visible bounds
+    const cx = cv.width / 2, cy = cv.height / 2;
+    const T = transformPass(cv.width, cv.height, spr, cx, cy);
+    yield;
+    const Wm = yield* composeWatermark(T, cv.width, cv.height, k);
+    const R = Math.hypot(spr.width, spr.height) * 0.9 + (+extDepth.value + +bevel.value) * k * 1.5 + 8;
+    const rx0 = Math.max(0, Math.floor(cx - R)), ry0 = Math.max(0, Math.floor(cy - R));
+    const rx1 = Math.min(cv.width, Math.ceil(cx + R)), ry1 = Math.min(cv.height, Math.ceil(cy + R));
+    const rw = rx1 - rx0, rh = ry1 - ry0;
+    if (rw <= 0 || rh <= 0) return;
+    const data = Wm.getContext('2d').getImageData(rx0, ry0, rw, rh).data;
+    let minX = rw, minY = rh, maxX = -1, maxY = -1;
+    for (let yy = 0; yy < rh; yy++) {
+      for (let xx = 0; xx < rw; xx++) {
+        if (data[(yy * rw + xx) * 4 + 3] > 8) {
+          if (xx < minX) minX = xx;
+          if (xx > maxX) maxX = xx;
+          if (yy < minY) minY = yy;
+          if (yy > maxY) maxY = yy;
+        }
+      }
+    }
+    if (maxX < 0) return;
+    const bx = rx0 + minX, by = ry0 + minY, bw = maxX - minX + 1, bh = maxY - minY + 1;
+    const stamp = getCanvas('stamp', bw, bh);
+    stamp.getContext('2d').drawImage(Wm, bx, by, bw, bh, 0, 0, bw, bh);
+    const sox = cx - bx, soy = cy - by;   // watermark centre inside the stamp
+    yield;
+
+    // 2) repeat it on a lattice that is rotated with the watermark; (x, y) is the anchor tile
+    const gap = 1 + tileGap.value / 100;
+    const stepX = Math.max(8, spr.width * gap), stepY = Math.max(8, spr.height * gap);
+    const th = getRot() * DEG, ct = Math.cos(th), st = Math.sin(th);
+    const diag = Math.hypot(cv.width, cv.height);
+    const nI = Math.ceil(diag / stepX) + 1, nJ = Math.ceil(diag / stepY) + 1;
+    let drawn = 0, t0 = performance.now();
+    c.save();
+    c.globalAlpha = opacity;
+    outer:
+    for (let j = -nJ; j <= nJ; j++) {
+      const off = (tile === 'stagger' && (j & 1)) ? stepX / 2 : 0;
+      for (let i = -nI; i <= nI; i++) {
+        const lx = i * stepX + off, ly = j * stepY;
+        const px = x + lx * ct - ly * st, py = y + lx * st + ly * ct;
+        if (px < -bw || px > cv.width + bw || py < -bh || py > cv.height + bh) continue;
+        c.drawImage(stamp, px - sox, py - soy);
+        if (++drawn >= 4000) break outer;                       // safety cap
+        if (performance.now() - t0 > SLICE_MS) { yield; t0 = performance.now(); }
+      }
+    }
+    c.restore();
+  }
+
+  const render = (cv, img) => runSync(renderGen(cv, img));
+  const renderAsync = (cv, img) => runAsync(renderGen(cv, img));
+
+  function draw() {
+    $('emptyState').hidden = !!currentImg;
+    if (busy) return;
+    if (!currentImg) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+    render(canvas, currentImg);
+  }
+
+  let raf = 0;
+  function scheduleDraw() {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0; draw(); });
+  }
+
+  function syncOutputs() {
+    document.querySelectorAll('input[type="range"]').forEach((r) => {
+      const o = $(r.id + 'Out');
+      if (o) o.textContent = r.value;
+    });
+  }
+
+  /* ---------- ইভেন্ট ---------- */
+  document.querySelectorAll('input[type="range"]').forEach((el) =>
+    el.addEventListener('input', () => {
+      if (el === rot) rotNum.value = rot.value;
+      syncOutputs();
+      scheduleDraw();
+    })
+  );
+  [wmText, extColor, rotNum].forEach((el) =>
+    el.addEventListener('input', () => {
+      if (el === rotNum) rot.value = rotNum.value;
+      scheduleDraw();
+    })
+  );
+  revAxis.addEventListener('change', scheduleDraw);
+
+  preset.addEventListener('change', () => { updatePreviewSize(); draw(); });
+  fit.addEventListener('change', draw);
+
+  document.querySelectorAll('input[name="wmMode"]').forEach((el) =>
+    el.addEventListener('change', () => {
+      const isText = mode() === 'text';
+      textGroup.hidden = !isText;
+      logoGroup.hidden = isText;
+      info.textContent = !isText && !logoImg ? 'Choose a logo image' : infoText;
+      draw();
+    })
+  );
+
+  $('resetFx').addEventListener('click', () => {
+    const defaults = { rot: 0, shearX: 0, shearY: 0, rotX: 0, rotY: 0, persp: 50,
+      extDepth: 0, extAngle: 45, bevel: 0, revSweep: 0, inflate: 0 };
+    for (const [id, v] of Object.entries(defaults)) $(id).value = v;
+    rotNum.value = 0;
+    extColor.value = '#444444';
+    revAxis.value = 'v';
+    syncOutputs();
+    draw();
+  });
+
+  /* ---------- ক্যানভাসে ড্র্যাগ: সরানো বা ফ্রি রোটেশন ---------- */
+  let drag = null;
+  function toCanvas(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height };
+  }
+  function normDeg(v) {
+    v = ((v + 180) % 360 + 360) % 360 - 180;
+    return v;
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!currentImg || busy) return;
+    canvas.setPointerCapture(e.pointerId);
+    const p = toCanvas(e);
+    const cx = canvas.width * wmX.value / 100, cy = canvas.height * wmY.value / 100;
+    drag = { p0: p, x0: +wmX.value, y0: +wmY.value, rot0: getRot(), a0: Math.atan2(p.y - cy, p.x - cx), cx, cy };
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const p = toCanvas(e);
+    if (dragMode() === 'move') {
+      wmX.value = Math.max(0, Math.min(100, drag.x0 + (p.x - drag.p0.x) / canvas.width * 100));
+      wmY.value = Math.max(0, Math.min(100, drag.y0 + (p.y - drag.p0.y) / canvas.height * 100));
+    } else {
+      const a = Math.atan2(p.y - drag.cy, p.x - drag.cx);
+      const v = Math.round(normDeg(drag.rot0 + (a - drag.a0) / DEG) * 10) / 10;
+      rotNum.value = v;
+      rot.value = v;
+    }
+    syncOutputs();
+    scheduleDraw();
+  });
+  const endDrag = () => { drag = null; };
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  /* ---------- ফাইল ইনপুট ---------- */
+  fileInput.addEventListener('change', (e) => setFiles(e.target.files));
+
+  async function setFiles(fileList) {
+    files = [...fileList].filter((f) => f.type.startsWith('image/'));
+    if (!files.length) {
+      currentImg = null;
+      controls.classList.add('off');
+      setInfo('Please choose image files.');
+      draw();
+      return;
+    }
+    try {
+      currentImg = await loadImage(files[0]);
+      controls.classList.remove('off');
+      setInfo(files.length === 1
+        ? `${files[0].name} (${currentImg.width}×${currentImg.height})`
+        : `${files.length} images selected (preview: ${files[0].name})`);
+      updatePreviewSize();
+      draw();
+    } catch {
+      setInfo('Could not load the first image.');
+    }
+  }
+
+  // drag & drop onto the preview
+  const previewCard = $('previewCard');
+  const ringOn = ['ring-2', 'ring-indigo-400'];
+  ['dragenter', 'dragover'].forEach((t) => previewCard.addEventListener(t, (e) => {
+    e.preventDefault();
+    previewCard.classList.add(...ringOn);
+  }));
+  ['dragleave', 'drop'].forEach((t) => previewCard.addEventListener(t, (e) => {
+    e.preventDefault();
+    previewCard.classList.remove(...ringOn);
+  }));
+  previewCard.addEventListener('drop', (e) => {
+    if (busy || !e.dataTransfer.files.length) return;
+    try { fileInput.files = e.dataTransfer.files; } catch { /* some browsers disallow this */ }
+    setFiles(e.dataTransfer.files);
+  });
+
+  // click (or Enter/Space) on the empty drop zone opens the file picker
+  const emptyState = $('emptyState');
+  emptyState.addEventListener('click', () => { if (!busy) fileInput.click(); });
+  emptyState.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!busy) fileInput.click(); }
+  });
+
+  logoInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      info.textContent = 'Please choose an image file for the logo.';
+      return;
+    }
+    try {
+      logoImg = await loadImage(file);
+      setInfo(`Logo: ${file.name} (${logoImg.width}×${logoImg.height})`);
+      draw();
+    } catch {
+      info.textContent = 'Could not load the logo.';
+    }
+  });
+
+  /* ---------- ব্যাচ প্রসেস ও ZIP ---------- */
+  function uniqueName(base, ext, used) {
+    let name = `${base}-wm.${ext}`, n = 2;
+    while (used.has(name)) name = `${base}-wm-${n++}.${ext}`;
+    used.add(name);
+    return name;
+  }
+
+  /* ---------- Fonts ---------- */
+  const FONTS = [
+    { label: 'System Sans',      css: 'system-ui, -apple-system, "Segoe UI", sans-serif', weight: 700 },
+    { label: 'Inter',            css: '"Inter", sans-serif',            weight: 700 },
+    { label: 'Roboto',           css: '"Roboto", sans-serif',           weight: 700 },
+    { label: 'Montserrat',       css: '"Montserrat", sans-serif',       weight: 700 },
+    { label: 'Oswald',           css: '"Oswald", sans-serif',           weight: 700 },
+    { label: 'Bebas Neue',       css: '"Bebas Neue", sans-serif',       weight: 400 },
+    { label: 'Anton',            css: '"Anton", sans-serif',            weight: 400 },
+    { label: 'Playfair Display', css: '"Playfair Display", serif',      weight: 700 },
+    { label: 'Georgia',          css: 'Georgia, "Times New Roman", serif', weight: 700 },
+    { label: 'Roboto Mono',      css: '"Roboto Mono", monospace',       weight: 700 },
+    { label: 'Lobster',          css: '"Lobster", cursive',             weight: 400 },
+    { label: 'Pacifico',         css: '"Pacifico", cursive',            weight: 400 },
+    { label: 'Dancing Script',   css: '"Dancing Script", cursive',      weight: 700 },
+    { label: 'Sacramento',       css: '"Sacramento", cursive',          weight: 400 },
+    { label: 'Permanent Marker', css: '"Permanent Marker", cursive',    weight: 400 },
+  ];
+  const currentFont = () => FONTS[parseInt(fontSel.value, 10) || 0];
+
+  function updateFontPreview() {
+    const f = currentFont();
+    fontPreview.style.fontFamily = f.css;
+    fontPreview.style.fontWeight = f.weight;
+  }
+  // web fonts load lazily; make sure the one we need is ready before drawing
+  async function loadCurrentFont() {
+    const f = currentFont();
+    try { await document.fonts.load(`${f.weight} 32px ${f.css}`, 'Ag'); } catch { /* use fallback font */ }
+  }
+  function contrastColor(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+    return lum > 0.6 ? '#000000' : '#ffffff';
+  }
+
+  /* ---------- Output size, format & resize ---------- */
+  const tileMode = () => document.querySelector('input[name="tileMode"]:checked').value;
+  const MAX_SIDE = 8192, MAX_AREA = 16e6;   // keeps memory use sane
+
+  function baseSize(img) {
+    return preset.value === 'original' ? [img.width, img.height] : preset.value.split('x').map(Number);
+  }
+
+  function outputSize(img) {
+    const [bw, bh] = baseSize(img);
+    const m = rsMode.value;
+    const W = parseInt(rsW.value, 10), H = parseInt(rsH.value, 10), P = parseFloat(rsPct.value);
+    let w = bw, h = bh;
+    if (m === 'width' && W > 0) { w = W; h = bh * W / bw; }
+    else if (m === 'height' && H > 0) { h = H; w = bw * H / bh; }
+    else if (m === 'both' && W > 0 && H > 0) { w = W; h = H; }
+    else if (m === 'notLarger' && W > 0 && H > 0) { const r = Math.min(1, W / bw, H / bh); w = bw * r; h = bh * r; }
+    else if (m === 'notSmaller' && W > 0 && H > 0) { const r = Math.max(1, W / bw, H / bh); w = bw * r; h = bh * r; }
+    else if (m === 'percent' && P > 0) { w = bw * P / 100; h = bh * P / 100; }
+    const r = Math.min(1, MAX_SIDE / Math.max(w, h), Math.sqrt(MAX_AREA / (w * h)));
+    return { w: Math.max(1, Math.round(w * r)), h: Math.max(1, Math.round(h * r)), clamped: r < 1 };
+  }
+
+  function formatLabel() {
+    const v = outFormat.value;
+    let t = v === 'original' ? 'original format' : v.startsWith('jpeg') ? 'JPEG' : v === 'png' ? 'PNG' : 'WEBP';
+    if (rsMode.value === 'filesize') t = 'JPEG/WEBP, up to ' + (rsKB.value || '?') + ' KB';
+    return t;
+  }
+
+  // the preview is drawn at most ~1200px wide/high; everything scales with canvas width, so it matches the export
+  function updatePreviewSize() {
+    if (!currentImg) { outInfo.textContent = ''; return; }
+    const o = outputSize(currentImg);
+    const r = Math.min(1, 1200 / Math.max(o.w, o.h));
+    const pw = Math.max(1, Math.round(o.w * r)), ph = Math.max(1, Math.round(o.h * r));
+    if (canvas.width !== pw || canvas.height !== ph) { canvas.width = pw; canvas.height = ph; }
+    outInfo.textContent = `Output (first image): ${o.w}×${o.h} px · ${formatLabel()}` +
+      (o.clamped ? ' · size limited to about 16 megapixels' : '');
+  }
+
+  function syncResizeUI() {
+    const m = rsMode.value;
+    $('rsWRow').hidden = !['width', 'both', 'notLarger', 'notSmaller'].includes(m);
+    $('rsHRow').hidden = !['height', 'both', 'notLarger', 'notSmaller'].includes(m);
+    $('rsPctRow').hidden = m !== 'percent';
+    $('rsKBRow').hidden = m !== 'filesize';
+    $('rsHint').textContent = {
+      none: 'Output keeps the size chosen under "Canvas".',
+      width: 'Height follows automatically to keep the aspect ratio.',
+      height: 'Width follows automatically to keep the aspect ratio.',
+      both: 'Exact size. The picture is re-fitted using "Image fit", so it is never stretched.',
+      notLarger: 'Shrinks to fit inside this box. Smaller images stay as they are.',
+      notSmaller: 'Enlarges to at least this size. Larger images stay as they are.',
+      percent: 'Scales width and height by this percentage.',
+      filesize: 'Lowers quality (and size, if needed) to stay under the limit. PNG output becomes JPEG.',
+    }[m];
+  }
+
+  function resizeError() {
+    const W = parseInt(rsW.value, 10), H = parseInt(rsH.value, 10);
+    const P = parseFloat(rsPct.value), KB = parseFloat(rsKB.value);
+    switch (rsMode.value) {
+      case 'width': return W > 0 ? '' : 'Enter a valid width.';
+      case 'height': return H > 0 ? '' : 'Enter a valid height.';
+      case 'both': case 'notLarger': case 'notSmaller': return W > 0 && H > 0 ? '' : 'Enter a valid width and height.';
+      case 'percent': return P > 0 ? '' : 'Enter a valid percentage.';
+      case 'filesize': return KB > 0 ? '' : 'Enter a valid file size in KB.';
+      default: return '';
+    }
+  }
+
+  function encodeSpec(file) {
+    switch (outFormat.value) {
+      case 'jpeg-std': return { mime: 'image/jpeg', q: 0.9 };
+      case 'jpeg-max': return { mime: 'image/jpeg', q: 1 };
+      case 'jpeg-small': return { mime: 'image/jpeg', q: 0.7 };
+      case 'png': return { mime: 'image/png' };
+      case 'webp-std': return { mime: 'image/webp', q: 0.8 };
+      case 'webp-max': return { mime: 'image/webp', q: 1 };
+      default:   // keep the original format where we can encode it
+        if (file.type === 'image/jpeg') return { mime: 'image/jpeg', q: 0.92 };
+        if (file.type === 'image/webp') return { mime: 'image/webp', q: 0.92 };
+        return { mime: 'image/png' };
+    }
+  }
+  const extFor = (mime) => ({ 'image/jpeg': 'jpg', 'image/webp': 'webp' }[mime] || 'png');
+  const canvasToBlob = (cv, mime, q) => new Promise((resolve) => cv.toBlob(resolve, mime, q));
+
+  // "Specific file size": binary-search the quality; if even the lowest quality is too big, shrink and retry
+  async function encodeToTarget(cv, mime, target) {
+    if (mime === 'image/png') mime = 'image/jpeg';
+    let src = cv;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const first = await canvasToBlob(src, mime, 0.92);
+      if (first && first.size <= target) return first;
+      let lo = 0.05, hi = 0.92, best = null;
+      for (let n = 0; n < 7; n++) {
+        const mid = (lo + hi) / 2;
+        const b = await canvasToBlob(src, mime, mid);
+        if (b && b.size <= target) { best = b; lo = mid; } else { hi = mid; }
+      }
+      if (best) return best;
+      const nw = Math.max(1, Math.round(src.width * 0.8)), nh = Math.max(1, Math.round(src.height * 0.8));
+      const t = document.createElement('canvas');
+      t.width = nw; t.height = nh;
+      t.getContext('2d').drawImage(src, 0, 0, nw, nh);
+      src = t;
+    }
+    return canvasToBlob(src, mime, 0.05);
+  }
+
+  function releaseScratch() {
+    for (const key of Object.keys(scratch)) { scratch[key].width = 0; scratch[key].height = 0; delete scratch[key]; }
+  }
+
+  zipBtn.addEventListener('click', async () => {
+    if (!files.length) return;
+    if (typeof JSZip === 'undefined') {
+      info.textContent = 'JSZip failed to load. Check your internet connection and reload the page.';
+      return;
+    }
+    if (mode() === 'logo' && !logoImg) {
+      info.textContent = 'Choose a logo image first.';
+      return;
+    }
+    const rsErr = resizeError();
+    if (rsErr) { info.textContent = rsErr; return; }
+
+    zipBtn.disabled = true;
+    busy = true;
+    controls.classList.add('off');
+    fileInput.disabled = true;
+    try {
+    progress.hidden = false;
+    progressText.hidden = false;
+    const total = files.length;
+    progress.max = total;
+    progress.value = 0;
+    progressText.textContent = `0 / ${total} processed (0%)`;
+
+    const zip = new JSZip();
+    const used = new Set();
+    const off = document.createElement('canvas');
+    await loadCurrentFont();
+    const failed = [];
+
+    for (let i = 0; i < total; i++) {
+      info.textContent = `Processing image ${i + 1} of ${total}: ${files[i].name}`;
+      // let the browser repaint the progress bar before heavy work
+      await pause();
+      try {
+        const img = await loadBitmap(files[i]);
+        const o = outputSize(img);
+        if (off.width !== o.w || off.height !== o.h) { off.width = o.w; off.height = o.h; }
+        await renderAsync(off, img);
+        if (img.close) img.close();   // free memory right away
+        const spec = encodeSpec(files[i]);
+        const blob = rsMode.value === 'filesize'
+          ? await encodeToTarget(off, spec.mime, (parseFloat(rsKB.value) || 1) * 1024)
+          : await canvasToBlob(off, spec.mime, spec.q);
+        if (!blob) throw new Error('encode failed');
+        const base = files[i].name.replace(/\.[^.]+$/, '') || 'image';
+        zip.file(uniqueName(base, extFor(blob.type || spec.mime), used), blob);
+      } catch {
+        failed.push(files[i].name);
+      }
+      progress.value = i + 1;
+      progressText.textContent = `${i + 1} / ${total} processed (${Math.round((i + 1) / total * 100)}%)`;
+    }
+
+    if (used.size === 0) {
+      info.textContent = 'No images could be processed.';
+    } else {
+      info.textContent = 'Creating ZIP…';
+      progress.max = 100;
+      progress.value = 0;
+      const content = await zip.generateAsync({ type: 'blob', compression: 'STORE' }, (meta) => {
+        progress.value = meta.percent;
+        progressText.textContent = `Creating ZIP… ${Math.round(meta.percent)}%`;
+      });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'watermarked-images.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      progressText.textContent = `Done: ${used.size} / ${total} images added to the ZIP`;
+      info.textContent = `${used.size} image(s) added to the ZIP.` +
+        (failed.length ? ` Skipped: ${failed.join(', ')}` : '');
+    }
+
+    } finally {
+      zipBtn.disabled = false;
+      busy = false;
+      controls.classList.remove('off');
+      fileInput.disabled = false;
+      releaseScratch();   // give the big temporary canvases back to the browser
+    }
+  });
+
+  /* ---------- init & events for font, tile, download settings ---------- */
+  FONTS.forEach((f, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = f.label; o.style.fontFamily = f.css;
+    fontSel.appendChild(o);
+  });
+  fontSel.value = '0';
+  updateFontPreview();
+  loadCurrentFont().then(scheduleDraw);
+  syncResizeUI();
+
+  fontSel.addEventListener('change', async () => {
+    updateFontPreview();
+    scheduleDraw();
+    await loadCurrentFont();
+    scheduleDraw();
+  });
+  [textColor, textOutline].forEach((el) => el.addEventListener('input', scheduleDraw));
+
+  document.querySelectorAll('input[name="tileMode"]').forEach((el) =>
+    el.addEventListener('change', () => {
+      $('tileGapRow').hidden = tileMode() === 'single';
+      scheduleDraw();
+    })
+  );
+
+  rsMode.addEventListener('change', () => { syncResizeUI(); updatePreviewSize(); draw(); });
+  [rsW, rsH, rsPct, rsKB].forEach((el) => el.addEventListener('input', () => { updatePreviewSize(); draw(); }));
+  outFormat.addEventListener('change', updatePreviewSize);
+</script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

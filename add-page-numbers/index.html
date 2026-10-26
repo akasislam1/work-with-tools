@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Page Numbers to PDF Online | Work With Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Design tokens: identical to the Rotate PDF tool ===== */
+    :root {
+      --bg: #f5f6fa;
+      --surface: #ffffff;
+      --text: #1d2233;
+      --muted: #6b7288;
+      --border: #dfe3ee;
+      --primary: #3b5bdb;
+      --primary-dark: #2f49b3;
+      --primary-soft: #eaefff;
+      --danger: #c92a2a;
+      --radius: 12px;
+      --shadow: 0 2px 10px rgba(29, 34, 51, 0.07);
+      --font: "Inter", "Noto Sans Bengali", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+
+    /* Header */
+    .app-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+    .app-header h1 { margin: 0; font-size: 1.75rem; }
+    .app-header p { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+
+    /* Buttons */
+    .btn {
+      font: inherit; font-weight: 600; cursor: pointer;
+      padding: 9px 16px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn:hover:not(:disabled) { background: var(--primary-soft); border-color: var(--primary); }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); border-color: var(--primary-dark); }
+    .btn:focus-visible, .dropzone:focus-visible, .pos-btn:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--primary); outline-offset: 2px;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Dropzone */
+    .dropzone {
+      background: var(--surface); border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 64px 24px; text-align: center; cursor: pointer; box-shadow: var(--shadow);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .dropzone:hover, .dropzone.dragover { border-color: var(--primary); background: var(--primary-soft); }
+    .dropzone h2 { margin: 0 0 6px; font-size: 1.25rem; }
+    .dropzone p { margin: 0 0 18px; color: var(--muted); }
+    .note { margin-top: 14px; color: var(--muted); font-size: 0.875rem; text-align: center; }
+    .message { margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: #fff0f0; color: var(--danger); border: 1px solid #ffc9c9; }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 16px; box-shadow: var(--shadow); position: sticky; top: 8px; z-index: 5;
+    }
+    .file-info { min-width: 0; }
+    .file-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 36ch; }
+    .file-meta { color: var(--muted); font-size: 0.875rem; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .status { margin-top: 12px; color: var(--muted); font-size: 0.875rem; min-height: 1.4em; }
+
+    /* Settings + preview layout */
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 20px; align-items: start; }
+    .panel, .preview {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px; box-shadow: var(--shadow);
+    }
+    .field { margin-bottom: 16px; }
+    .field > label, .field > .label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    input[type="number"], select {
+      width: 100%; font: inherit; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text);
+    }
+    input[type="color"] { width: 100%; height: 44px; padding: 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+    .hint { margin: -8px 0 16px; color: var(--muted); font-size: 0.875rem; }
+    .summary { font-weight: 600; }
+
+    /* 3 x 2 position picker drawn as a mini page */
+    .pos-picker {
+      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto 56px auto; gap: 6px;
+      width: 210px; padding: 10px; background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .pos-btn { height: 32px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); cursor: pointer; }
+    .pos-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .pos-btn[aria-checked="true"] { background: var(--primary); border-color: var(--primary); }
+    .pos-btn.top { grid-row: 1; }
+    .pos-btn.bottom { grid-row: 3; }
+
+    /* Live preview */
+    .preview { position: sticky; top: 88px; }
+    .preview-title { font-weight: 600; margin-bottom: 10px; }
+    .preview-stage { display: flex; justify-content: center; background: var(--bg); border-radius: 8px; padding: 16px; }
+    .preview-paper { position: relative; display: flex; background: #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18); }
+    .preview-paper.loading { width: 280px; height: 380px; background: linear-gradient(90deg, #eceff6, #f7f8fc, #eceff6); }
+    .preview-paper canvas { display: block; }
+    .stamp {
+      position: absolute; line-height: 1; white-space: nowrap; pointer-events: none;
+      font-family: Helvetica, Arial, "Liberation Sans", sans-serif;
+      outline: 1px dashed var(--primary); outline-offset: 2px;
+    }
+
+    .hidden { display: none !important; }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .preview { position: static; }
+    }
+    @media (max-width: 560px) { .app-header { flex-direction: column; } }
+  </style>
+<meta name="description" content="Number the pages of a PDF. Choose position, format, start number and color. Free, private and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Add Page Numbers to PDF Online">
+<meta property="og:description" content="Number the pages of a PDF. Choose position, format, start number and color. Free, private and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+  <div class="container">
+    <header class="app-header">
+      <div>
+        <h1 data-i18n="title"></h1>
+        <p data-i18n="subtitle"></p>
+      </div>
+      <button class="btn" id="langToggle" style="display:none" aria-hidden="true" tabindex="-1" type="button"></button>
+    </header>
+
+    <!-- Upload view -->
+    <section id="uploadView">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button">
+        <h2 data-i18n="dropTitle"></h2>
+        <p data-i18n="dropHint"></p>
+        <button class="btn btn-primary" id="chooseBtn" type="button" data-i18n="chooseFile"></button>
+        <input type="file" id="fileInput" accept="application/pdf,.pdf" hidden>
+      </div>
+      <p class="note" data-i18n="privacyNote"></p>
+    </section>
+
+    <div id="errorBox" class="message hidden" role="alert"></div>
+
+    <!-- Editor view -->
+    <section id="editorView" class="hidden">
+      <div class="toolbar">
+        <div class="file-info">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-meta" id="fileMeta"></div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn" id="newFileBtn" type="button" data-i18n="newFile"></button>
+          <button class="btn btn-primary" id="downloadBtn" type="button" data-i18n="download"></button>
+        </div>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+
+      <div class="layout">
+        <div class="panel">
+          <div class="field">
+            <span class="label" id="posLabel" data-i18n="position"></span>
+            <div class="pos-picker" id="posPicker" role="radiogroup" aria-labelledby="posLabel"></div>
+          </div>
+          <div class="field">
+            <label for="format" data-i18n="format"></label>
+            <select id="format"></select>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="startNumber" data-i18n="startNumber"></label>
+              <input type="number" id="startNumber" min="0" step="1" value="1">
+            </div>
+            <div class="field">
+              <label for="startPage" data-i18n="startPage"></label>
+              <input type="number" id="startPage" min="1" step="1" value="1">
+            </div>
+          </div>
+          <div class="hint" data-i18n="startPageHint"></div>
+          <div class="row">
+            <div class="field">
+              <label for="fontSize" data-i18n="fontSize"></label>
+              <input type="number" id="fontSize" min="6" max="72" step="1" value="12">
+            </div>
+            <div class="field">
+              <label for="color" data-i18n="color"></label>
+              <input type="color" id="color" value="#000000">
+            </div>
+          </div>
+          <div class="summary" id="summary" aria-live="polite"></div>
+        </div>
+
+        <div class="preview">
+          <div class="preview-title" id="previewTitle"></div>
+          <div class="preview-stage">
+            <div class="preview-paper loading" id="previewPaper"><span class="stamp" id="stamp"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Libraries (loaded from cdnjs, pinned versions) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="script.js"></script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin | Work With Tools</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+<!-- Step 1: sign in -->
+<main id="connectView" class="center">
+  <form id="connectForm" class="card connect" autocomplete="on">
+    <div class="brand"><span class="mark">W</span> Work With Tools <span class="tag">Admin</span></div>
+    <h1>Sign in</h1>
+    <p class="muted">Manage your tools: add, edit, pause or remove them.</p>
+
+    <label class="field"><span>Username</span>
+      <input id="usernameInput" name="username" type="text" autocomplete="username" required spellcheck="false" autofocus>
+    </label>
+    <label class="field"><span>Password</span>
+      <input id="passwordInput" name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <label class="check"><input id="rememberInput" type="checkbox"><span>Keep me signed in on this device (30 days)</span></label>
+    <button class="btn primary wide" id="connectBtn" type="submit">Sign in</button>
+
+    <details class="help" id="setupHelp">
+      <summary>First-time setup (only once)</summary>
+      <p>Your username, password and GitHub access are stored privately in Vercel, never in this page.</p>
+      <ol>
+        <li>Create a GitHub token at <strong>github.com/settings/personal-access-tokens/new</strong>. Choose <strong>Only select repositories</strong> (this site's repo) and set <strong>Contents</strong> to <strong>Read and write</strong>.</li>
+        <li>In Vercel open your project &rarr; <strong>Settings &rarr; Environment Variables</strong> and add:
+          <ul>
+            <li><code>ADMIN_USERNAME</code> : the username you want</li>
+            <li><code>ADMIN_PASSWORD</code> : a long password (at least 10 characters, longer is better)</li>
+            <li><code>GITHUB_TOKEN</code> : the token from step 1</li>
+            <li><code>GITHUB_REPO</code> : <code>your-username/your-repo</code></li>
+          </ul>
+        </li>
+        <li>Go to <strong>Deployments</strong> and redeploy, then sign in here.</li>
+      </ol>
+    </details>
+  </form>
+</main>
+
+<!-- Step 2: the panel -->
+<div id="appView" hidden>
+  <header class="top">
+    <div class="brand"><span class="mark">W</span> Admin <span class="muted" id="repoLabel"></span></div>
+    <div class="top-actions">
+      <button class="btn" id="discardBtn" type="button">Discard changes</button>
+      <button class="btn primary" id="publishBtn" type="button" disabled>Publish changes</button>
+      <button class="btn ghost" id="disconnectBtn" type="button">Sign out</button>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="tools" aria-selected="true">Tools</button>
+    <button type="button" role="tab" data-tab="cats" aria-selected="false">Categories</button>
+    <button type="button" role="tab" data-tab="ads" aria-selected="false">Ads</button>
+    <button type="button" role="tab" data-tab="analytics" aria-selected="false">Analytics</button>
+    <button type="button" role="tab" data-tab="site" aria-selected="false">Site text</button>
+  </nav>
+  <main class="wrap" id="panel"></main>
+</div>
+
+<div id="modalRoot"></div>
+<script src="admin.js"></script>
+</body>
+</html>

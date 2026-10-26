@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Text To Photo Online – Captions, Quotes and Labels | Work With Tools</title>
+
+  <!-- Fonts: Hind Siliguri is the UI font and the Bengali fallback for every canvas font.
+       Bengali-capable: Hind Siliguri, Noto Sans Bengali, Noto Serif Bengali, Baloo Da 2, Tiro Bangla.
+       Latin only: Poppins, Playfair Display, Pacifico, Bebas Neue. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;700&family=Noto+Sans+Bengali:wght@500;700&family=Noto+Serif+Bengali:wght@500;700&family=Baloo+Da+2:wght@500;700&family=Tiro+Bangla:ital@0;1&family=Poppins:ital,wght@0,500;0,700;1,500;1,700&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Pacifico&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+  <style>
+    /* ---------- Design tokens ----------
+       Swap these values with the ones from the Watermark tool
+       to keep both tools visually identical. */
+    :root {
+      --bg: #eef1f5;
+      --surface: #ffffff;
+      --ink: #1b2430;
+      --ink-soft: #5b6676;
+      --border: #d5dbe4;
+      --accent: #2f6fed;
+      --accent-ink: #ffffff;
+      --stage: #1b2430;
+      --danger: #c0392b;
+      --radius: 10px;
+      --font: "Hind Siliguri", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    /* ---------- Header ---------- */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .header h1 { margin: 0; font-size: 1.75rem; font-weight: 600; line-height: 1.3; }
+    .header p { margin: 4px 0 0; color: var(--ink-soft); }
+
+    .lang-switch {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .lang-switch button {
+      font: inherit;
+      padding: 6px 14px;
+      border: 0;
+      background: transparent;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .lang-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+    /* ---------- Drop zone ---------- */
+    .dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 260px;
+      padding: 24px;
+      text-align: center;
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color .15s, background-color .15s;
+    }
+    .dropzone:hover,
+    .dropzone.is-over { border-color: var(--accent); background: #f3f7ff; }
+    .dropzone-title { font-size: 1.25rem; font-weight: 500; }
+    .dropzone-hint { color: var(--ink-soft); }
+
+    .error { margin: 12px 0 0; color: var(--danger); font-weight: 500; }
+
+    /* ---------- Editor layout ---------- */
+    .editor {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* The stage stays in view while the long controls panel scrolls */
+    .stage {
+      position: sticky;
+      top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      padding: 12px;
+      background: var(--stage);
+      border-radius: var(--radius);
+    }
+    .stage.is-over { outline: 2px dashed var(--accent); outline-offset: -6px; }
+
+    canvas {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 80vh;
+      touch-action: none; /* lets touch drag move the text instead of scrolling the page */
+      cursor: default;
+    }
+
+    /* ---------- Controls panel ---------- */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .styles { display: flex; flex-direction: column; gap: 18px; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label, .field .label { font-weight: 500; }
+    .field-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .field-row.fill > :first-child { flex: 1; }
+    .value { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+    /* Optional effect groups (outline, shadow, background box) */
+    .group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .toggle { display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; }
+    .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+    .group-body { display: flex; flex-direction: column; gap: 12px; }
+
+    textarea, select {
+      font: inherit;
+      width: 100%;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    textarea { min-height: 84px; resize: vertical; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    input[type="color"] {
+      width: 48px;
+      height: 36px;
+      padding: 2px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .btn {
+      font: inherit;
+      padding: 8px 12px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn:hover:not(:disabled) { border-color: var(--accent); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+    .btn-danger:hover:not(:disabled) { border-color: var(--danger); color: var(--danger); }
+    .btn-square { min-width: 40px; padding-inline: 0; }
+    .btn[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+
+    /* ---------- Layers ---------- */
+    .layer-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .layer-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 176px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .layer-list:empty { display: none; }
+    .layer-list li + li { border-top: 1px solid var(--border); }
+    .layer-item {
+      display: block;
+      width: 100%;
+      padding: 8px 10px;
+      font: inherit;
+      text-align: left;
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .layer-item:hover { background: #f3f7ff; }
+    .layer-item[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+    .hint { margin: 0; font-size: .9rem; color: var(--ink-soft); }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    @media (max-width: 800px) {
+      .editor { grid-template-columns: 1fr; }
+      .header h1 { font-size: 1.4rem; }
+      /* Keep the photo visible while adjusting controls on a phone */
+      .stage { top: 0; z-index: 5; min-height: 0; }
+      canvas { max-height: 38vh; }
+    }
+  </style>
+<meta name="description" content="Add text to your photos. Choose fonts, colors and styles, then drag each text layer into place. Free and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Add Text To Photo Online – Captions, Quotes and Labels">
+<meta property="og:description" content="Add text to your photos. Choose fonts, colors and styles, then drag each text layer into place. Free and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+  <div class="app">
+    <header class="header">
+      <div>
+        <h1 data-i18n="title">Add Text To Photo</h1>
+        <p data-i18n="subtitle"></p>
+      </div>
+      <div class="lang-switch" style="display:none" hidden role="group" data-i18n-aria="languageLabel">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="bn" aria-pressed="false">বাংলা</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Step 1: upload -->
+      <div id="dropzone" class="dropzone" role="button" tabindex="0">
+        <span class="dropzone-title" data-i18n="dropTitle"></span>
+        <span class="dropzone-hint" data-i18n="dropHint"></span>
+      </div>
+      <input id="fileInput" type="file" accept="image/*" hidden>
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <!-- Step 2: editor -->
+      <section id="editor" class="editor" hidden>
+        <div id="stage" class="stage">
+          <canvas id="canvas" data-i18n-aria="canvasLabel"></canvas>
+        </div>
+
+        <div id="panel" class="panel">
+          <!-- Layers -->
+          <div class="field">
+            <span id="layersLabel" class="label" data-i18n="layersLabel"></span>
+            <div class="layer-actions">
+              <button id="addLayerBtn" type="button" class="btn btn-primary" data-i18n="addText"></button>
+              <button id="dupLayerBtn" type="button" class="btn" data-i18n="duplicate"></button>
+              <button id="delLayerBtn" type="button" class="btn btn-danger" data-i18n="delete"></button>
+              <button id="upLayerBtn" type="button" class="btn btn-square" data-i18n-aria="bringForward" data-i18n-title="bringForward">▲</button>
+              <button id="downLayerBtn" type="button" class="btn btn-square" data-i18n-aria="sendBackward" data-i18n-title="sendBackward">▼</button>
+            </div>
+            <ul id="layerList" class="layer-list" aria-labelledby="layersLabel"></ul>
+            <p id="noLayers" class="hint" data-i18n="noLayers" hidden></p>
+          </div>
+
+          <!-- Style controls for the selected layer. Each control maps to a layer property via data-prop. -->
+          <div id="styles" class="styles" hidden>
+            <div class="field">
+              <label for="textInput" data-i18n="textLabel"></label>
+              <textarea id="textInput" data-prop="text" data-i18n-placeholder="textPlaceholder"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="fontSelect" data-i18n="fontLabel"></label>
+              <div class="field-row fill">
+                <select id="fontSelect" data-prop="font"></select>
+                <button id="boldBtn" type="button" class="btn btn-square" data-toggle="bold" aria-pressed="false" data-i18n-aria="bold" data-i18n-title="bold"><strong>B</strong></button>
+                <button id="italicBtn" type="button" class="btn btn-square" data-toggle="italic" aria-pressed="false" data-i18n-aria="italic" data-i18n-title="italic"><em>I</em></button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-row">
+                <label for="sizeInput" data-i18n="sizeLabel"></label>
+                <span class="value" data-out="sizePercent"></span>
+              </div>
+              <input id="sizeInput" type="range" min="2" max="30" step="0.5" data-prop="sizePercent">
+            </div>
+
+            <div class="field-row">
+              <label for="colorInput" data-i18n="colorLabel"></label>
+              <span class="value" data-out="color"></span>
+              <input id="colorInput" type="color" data-prop="color">
+            </div>
+
+            <!-- Outline -->
+            <div class="group">
+              <label class="toggle"><input type="checkbox" data-prop="outlineOn"><span data-i18n="outline"></span></label>
+              <div class="group-body" data-group="outlineOn" hidden>
+                <div class="field-row">
+                  <label for="outlineColor" data-i18n="outlineColor"></label>
+                  <input id="outlineColor" type="color" data-prop="outlineColor">
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <label for="outlineWidth" data-i18n="outlineWidth"></label>
+                    <span class="value" data-out="outlineWidth"></span>
+                  </div>
+                  <input id="outlineWidth" type="range" min="1" max="25" step="0.5" data-prop="outlineWidth">
+                </div>
+              </div>
+            </div>
+
+            <!-- Shadow -->
+            <div class="group">
+              <label class="toggle"><input type="checkbox" data-prop="shadowOn"><span data-i18n="shadow"></span></label>
+              <div class="group-body" data-group="shadowOn" hidden>
+                <div class="field-row">
+                  <label for="shadowColor" data-i18n="shadowColor"></label>
+                  <input id="shadowColor" type="color" data-prop="shadowColor">
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <label for="shadowBlur" data-i18n="shadowBlur"></label>
+                    <span class="value" data-out="shadowBlur"></span>
+                  </div>
+                  <input id="shadowBlur" type="range" min="0" max="40" step="1" data-prop="shadowBlur">
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <label for="shadowDistance" data-i18n="shadowDistance"></label>
+                    <span class="value" data-out="shadowDistance"></span>
+                  </div>
+                  <input id="shadowDistance" type="range" min="0" max="30" step="1" data-prop="shadowDistance">
+                </div>
+              </div>
+            </div>
+
+            <!-- Background box -->
+            <div class="group">
+              <label class="toggle"><input type="checkbox" data-prop="bgOn"><span data-i18n="background"></span></label>
+              <div class="group-body" data-group="bgOn" hidden>
+                <div class="field-row">
+                  <label for="bgColor" data-i18n="bgColor"></label>
+                  <input id="bgColor" type="color" data-prop="bgColor">
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <label for="bgOpacity" data-i18n="bgOpacity"></label>
+                    <span class="value" data-out="bgOpacity"></span>
+                  </div>
+                  <input id="bgOpacity" type="range" min="0" max="100" step="1" data-prop="bgOpacity">
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <label for="bgPadding" data-i18n="bgPadding"></label>
+                    <span class="value" data-out="bgPadding"></span>
+                  </div>
+                  <input id="bgPadding" type="range" min="0" max="100" step="1" data-prop="bgPadding">
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <label for="bgRadius" data-i18n="bgRadius"></label>
+                    <span class="value" data-out="bgRadius"></span>
+                  </div>
+                  <input id="bgRadius" type="range" min="0" max="50" step="1" data-prop="bgRadius">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="hint" data-i18n="dragHint"></p>
+          <button id="changeBtn" type="button" class="btn" data-i18n="changeImage"></button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

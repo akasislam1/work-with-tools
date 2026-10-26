@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compress PDF Online – Reduce PDF File Size | Work With Tools</title>
+<style>
+  /* ---- Theme: same variables as the Merge PDF and Split PDF tools ---- */
+  :root {
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --ink: #1c2433;
+    --muted: #667085;
+    --line: #dfe3ec;
+    --accent: #3a5bd9;
+    --accent-ink: #ffffff;
+    --accent-soft: #eaeefc;
+    --danger: #c0352b;
+    --danger-soft: #fdeceb;
+    --warn: #8a5300;
+    --warn-soft: #fff5e0;
+    --warn-line: #f0d9a8;
+    --ok: #1d7a46;
+    --ok-soft: #e8f6ee;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Bengali", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 16px 56px; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  h1 { margin: 0; font-size: 1.6rem; }
+  .sub { margin: 4px 0 0; color: var(--muted); font-size: .95rem; }
+  .lang {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 999px; padding: 6px 14px; font: inherit; cursor: pointer;
+  }
+  .drop {
+    display: block; text-align: center; cursor: pointer;
+    background: var(--card); border: 2px dashed var(--line); border-radius: var(--radius);
+    padding: 32px 16px; transition: border-color .15s, background .15s;
+  }
+  .drop:hover, .drop.over, .drop:focus-within { border-color: var(--accent); background: var(--accent-soft); }
+  .drop strong { display: block; font-size: 1.05rem; }
+  .drop span { color: var(--muted); font-size: .9rem; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+  .filecard {
+    display: flex; align-items: center; gap: 12px; justify-content: space-between;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px;
+  }
+  .filecard .info { min-width: 0; }
+  .fname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fmeta { color: var(--muted); font-size: .85rem; }
+  .btn {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 8px; padding: 7px 12px; font: inherit; font-size: .9rem; cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { background: var(--accent-soft); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .errors { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .errors li {
+    display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+    background: var(--danger-soft); color: var(--danger);
+    border: 1px solid #f3c4c0; border-radius: 10px; padding: 10px 12px; font-size: .92rem;
+  }
+  .errors button { border: 0; background: none; color: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; }
+
+  .modes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 20px 0 12px; }
+  .mode, .seg {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 10px; padding: 10px 8px; font: inherit; font-size: .92rem; cursor: pointer;
+  }
+  .mode[aria-pressed="true"], .seg[aria-pressed="true"] {
+    background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600;
+  }
+  .mode:disabled, .seg:disabled { opacity: .6; cursor: not-allowed; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+  .panel .field { display: block; font-weight: 600; margin-bottom: 6px; }
+  .group { margin-top: 16px; }
+  .group:first-child { margin-top: 0; }
+  .note { color: var(--muted); font-size: .88rem; margin: 6px 0 0; }
+  .warn {
+    background: var(--warn-soft); border: 1px solid var(--warn-line); color: var(--warn);
+    border-radius: 10px; padding: 10px 12px; font-size: .92rem; margin-bottom: 14px;
+  }
+  .warn strong { display: block; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .check { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .targetrow { display: flex; gap: 8px; margin-top: 8px; }
+  .targetrow input, .targetrow select {
+    font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink);
+  }
+  .targetrow input { flex: 1; min-width: 0; }
+  .targetrow :disabled { opacity: .5; }
+
+  .actions { margin-top: 18px; }
+  .inlineerr {
+    background: var(--danger-soft); color: var(--danger); border: 1px solid #f3c4c0;
+    border-radius: 10px; padding: 9px 12px; font-size: .92rem; margin-bottom: 10px;
+  }
+  progress { display: block; width: 100%; height: 6px; margin-bottom: 8px; accent-color: var(--accent); }
+  .statusrow { display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 1.6em; margin-bottom: 8px; }
+  .status { color: var(--muted); font-size: .9rem; text-align: center; }
+  .go {
+    width: 100%; border: 0; border-radius: var(--radius); background: var(--accent); color: var(--accent-ink);
+    font: inherit; font-weight: 600; font-size: 1.05rem; padding: 14px; cursor: pointer;
+  }
+  .go:disabled { opacity: .45; cursor: not-allowed; }
+
+  .result { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .stat { background: var(--bg); border-radius: 10px; padding: 10px 4px; }
+  .stat .v { font-size: 1.15rem; font-weight: 700; }
+  .stat .k { color: var(--muted); font-size: .82rem; }
+  .stat.good .v { color: var(--ok); }
+  .msg { border-radius: 10px; padding: 9px 12px; font-size: .9rem; margin: 12px 0 0; }
+  .msg.warn { background: var(--warn-soft); border: 1px solid var(--warn-line); color: var(--warn); }
+  .msg.ok { background: var(--ok-soft); border: 1px solid #bfe3cd; color: var(--ok); }
+  .result .go { margin-top: 14px; }
+  button:focus-visible, .drop:focus-within, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .hidden, [hidden] { display: none !important; }
+</style>
+<meta name="description" content="Make a PDF smaller with light or strong compression. Free, private and runs in your browser.">
+<meta name="theme-color" content="#1f4bd8">
+<meta property="og:title" content="Compress PDF Online – Reduce PDF File Size">
+<meta property="og:description" content="Make a PDF smaller with light or strong compression. Free, private and runs in your browser.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1 data-i18n="title">Compress PDF</h1>
+      <p class="sub" data-i18n="subtitle"></p>
+    </div>
+    <button class="lang" id="langBtn" style="display:none" aria-hidden="true" tabindex="-1" type="button"></button>
+  </header>
+
+  <label class="drop" id="dropZone">
+    <input type="file" id="fileInput" accept="application/pdf,.pdf">
+    <strong data-i18n="dropTitle"></strong>
+    <span data-i18n="dropHint"></span>
+  </label>
+
+  <div class="filecard hidden" id="fileCard">
+    <div class="info">
+      <div class="fname" id="fileName"></div>
+      <div class="fmeta" id="fileMeta"></div>
+    </div>
+    <button class="btn" id="changeBtn" type="button" data-i18n="change"></button>
+  </div>
+
+  <ul class="errors" id="errors" role="alert"></ul>
+
+  <div id="workspace" class="hidden">
+    <div class="modes" role="group">
+      <button class="mode" type="button" data-mode="light" data-i18n="modeLight"></button>
+      <button class="mode" type="button" data-mode="strong" data-i18n="modeStrong"></button>
+    </div>
+
+    <div class="panel" data-panel="light">
+      <p class="note" style="margin:0" data-i18n="lightNote"></p>
+    </div>
+
+    <div class="panel hidden" data-panel="strong">
+      <div class="warn" role="note">
+        <strong data-i18n="warnTitle"></strong>
+        <span data-i18n="warnText"></span>
+      </div>
+
+      <div class="group">
+        <label class="field" for="qualityRange"><span id="qualityLabel"></span>: <output id="qualityOut"></output></label>
+        <input type="range" id="qualityRange" min="10" max="95" step="5" value="60">
+        <p class="note" data-i18n="qualityNote"></p>
+      </div>
+
+      <div class="group">
+        <div class="field" data-i18n="dpiLabel"></div>
+        <div class="segs" role="group">
+          <button class="seg" type="button" data-dpi="72">72 DPI</button>
+          <button class="seg" type="button" data-dpi="100">100 DPI</button>
+          <button class="seg" type="button" data-dpi="150">150 DPI</button>
+        </div>
+        <p class="note" data-i18n="dpiNote"></p>
+      </div>
+
+      <div class="group">
+        <label class="check"><input type="checkbox" id="targetChk"><span data-i18n="targetLabel"></span></label>
+        <div class="targetrow">
+          <input type="number" id="targetValue" min="0" step="any" inputmode="decimal" disabled>
+          <select id="targetUnit" disabled aria-label="Unit">
+            <option value="KB">KB</option>
+            <option value="MB" selected>MB</option>
+          </select>
+        </div>
+        <p class="note" data-i18n="targetNote"></p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="inlineerr hidden" id="actionError" role="alert"></div>
+      <progress id="bar" max="100" value="0" hidden></progress>
+      <div class="statusrow">
+        <div class="status" id="status" aria-live="polite"></div>
+        <button class="btn hidden" id="cancelBtn" type="button" data-i18n="cancel"></button>
+      </div>
+      <button class="go" id="goBtn" type="button" data-i18n="compress"></button>
+    </div>
+
+    <div class="result hidden" id="result" aria-live="polite">
+      <div class="stats">
+        <div class="stat"><div class="v" id="sBefore"></div><div class="k" data-i18n="before"></div></div>
+        <div class="stat"><div class="v" id="sAfter"></div><div class="k" data-i18n="after"></div></div>
+        <div class="stat" id="sSavedBox"><div class="v" id="sSaved"></div><div class="k" data-i18n="saved"></div></div>
+      </div>
+      <div id="resultMsgs"></div>
+      <button class="go" id="downloadBtn" type="button"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="script.js"></script>
+<script src="../assets/tools.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>

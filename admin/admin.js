@@ -366,6 +366,7 @@
 
   /* ---------- sign in / load ---------- */
   function showLogin() {
+    P = { cfg: null, edit: null, mail: '', pay: null, users: null, err: null, loading: false, q: '' };
     statsCache = null; statsErr = null; statsLoading = false;
     conn = null;
     S = { tools: [], cats: [], site: {}, ads: defaultAds(), base: '', pending: new Map(), delFolders: new Set() };
@@ -421,6 +422,7 @@
     else if (activeTab === 'cats') renderCats(p);
     else if (activeTab === 'ads') renderAds(p);
     else if (activeTab === 'analytics') renderAnalytics(p);
+    else if (activeTab === 'premium') renderPremium(p);
     else renderSite(p);
     touch();
   }
@@ -634,6 +636,179 @@
       } }
     ]);
     if (ok) render();
+  }
+
+  /* ----- premium tab: free-plan limits, payment methods, payment requests and members ----- */
+  var P = { cfg: null, edit: null, mail: '', pay: null, users: null, err: null, loading: false, q: '' };
+  async function acct(action, body) {
+    var res = await fetch('/api/acct?action=' + action, {
+      method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+      headers: { 'X-WT-Admin': '1', 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined
+    });
+    var data = {};
+    try { data = await res.json(); } catch (e) { /* not JSON */ }
+    if (!res.ok) throw Object.assign(new Error(data.message || ('Error ' + res.status)), { code: data.code || '' });
+    return data;
+  }
+  function loadPremium() {
+    if (P.loading) return;
+    P.loading = true; P.err = null;
+    Promise.all([acct('a_cfg'), acct('a_pay'), acct('a_users')]).then(function (r) {
+      P.cfg = r[0].cfg; P.edit = JSON.parse(JSON.stringify(r[0].cfg)); P.mail = r[0].mail || ''; P.pay = r[1].list; P.users = r[2].list;
+    }).catch(function (e) { P.err = { code: e.code || '', message: e.message }; })
+      .then(function () { P.loading = false; if (activeTab === 'premium') render(); });
+  }
+  function reloadLists() {
+    return Promise.all([acct('a_pay'), acct('a_users')]).then(function (r) { P.pay = r[0].list; P.users = r[1].list; if (activeTab === 'premium') render(); });
+  }
+  function shortDate(ms) { return ms ? new Date(ms).toISOString().slice(0, 10) : ''; }
+
+  function renderPremium(p) {
+    if (!P.cfg && !P.err && !P.loading) loadPremium();
+    var root = h('div', { class: 'dash' });
+    p.append(root);
+    root.append(h('div', { class: 'bar' }, h('h2', { class: 'grow', text: 'Premium' }),
+      h('button', { type: 'button', class: 'btn small', text: 'Refresh', disabled: P.loading, onclick: function () { P.cfg = null; P.err = null; loadPremium(); render(); } })));
+    if (P.loading && !P.cfg) { root.append(h('p', { class: 'muted', text: 'Loading…' })); return; }
+    if (P.err) {
+      root.append(h('div', { class: 'card' }, P.err.code === 'storage'
+        ? [h('h3', { text: 'Connect the database first' }), h('p', { class: 'muted', text: 'Accounts and payments are stored in the same free Upstash Redis database as Analytics. Open the Analytics tab for the 2-minute setup, redeploy, then come back here.' })]
+        : h('p', { class: 'err', text: P.err.message })));
+      return;
+    }
+    if (!P.cfg) return;
+
+    var pend = (P.pay || []).filter(function (r) { return r.status === 'pending'; });
+    var done = (P.pay || []).filter(function (r) { return r.status !== 'pending'; }).slice(0, 15);
+
+    /* --- 1. requests waiting --- */
+    var reqCard = h('div', { class: 'card' }, h('h3', { text: 'Payment requests waiting (' + pend.length + ')' }));
+    if (!pend.length) reqCard.append(h('p', { class: 'muted', text: 'Nothing waiting. New requests appear here after a member uploads a screenshot.' }));
+    pend.forEach(function (r) {
+      var img = h('img', { src: '/api/acct?action=proof&id=' + r.id, alt: 'Payment screenshot from ' + r.email, loading: 'lazy' });
+      img.style.maxWidth = '280px'; img.style.maxHeight = '280px'; img.style.borderRadius = '8px'; img.style.border = '1px solid #d9e2f5'; img.style.display = 'block';
+      reqCard.append(h('div', { class: 'card' },
+        h('div', null, h('strong', { text: r.email }), ' · ' + r.planLabel + ' · ' + r.amount + ' ' + r.currency + ' · via ' + r.methodName),
+        h('div', { class: 'muted', text: new Date(r.created).toLocaleString() + (r.ref ? ' · Reference: ' + r.ref : '') }),
+        h('p', null, h('a', { href: '/api/acct?action=proof&id=' + r.id, target: '_blank', rel: 'noopener' }, img)),
+        h('div', { class: 'bar' },
+          h('button', { type: 'button', class: 'btn primary small', text: 'Approve (+' + r.days + ' days)', onclick: function (e) {
+            if (!confirm('Check that the money really arrived. Give ' + r.email + ' ' + r.days + ' days of Premium?')) return;
+            e.target.disabled = true;
+            acct('a_decide', { id: r.id, decision: 'approve' }).then(function (d) {
+              notify('Approved. ' + (d.mail && d.mail.ok ? 'The member was emailed.' : 'The member is upgraded, but the email was not sent (' + ((d.mail && d.mail.error) || 'not set up') + ').'), 'ok');
+              return reloadLists();
+            }).catch(function (err) { notify(err.message, 'err'); e.target.disabled = false; });
+          } }),
+          h('button', { type: 'button', class: 'btn danger small', text: 'Reject', onclick: function (e) {
+            var why = prompt('Reason to show the member (optional):', '');
+            if (why === null) return;
+            e.target.disabled = true;
+            acct('a_decide', { id: r.id, decision: 'reject', note: why }).then(function () { notify('Rejected.', 'ok'); return reloadLists(); })
+              .catch(function (err) { notify(err.message, 'err'); e.target.disabled = false; });
+          } }))));
+    });
+    root.append(reqCard);
+    if (done.length) {
+      root.append(h('div', { class: 'card' }, h('h3', { text: 'Recent decisions' }), h('div', { class: 'tablewrap' }, h('table', { class: 'tbl' },
+        h('thead', null, h('tr', null, ['Date', 'Member', 'Plan', 'Amount', 'Result'].map(function (c) { return h('th', { text: c }); }))),
+        h('tbody', null, done.map(function (r) {
+          return h('tr', null, h('td', { text: shortDate(r.decided || r.created) }), h('td', { text: r.email }), h('td', { text: r.planLabel }),
+            h('td', { text: r.amount + ' ' + r.currency }), h('td', { text: r.status === 'approved' ? 'Approved' : 'Rejected' }));
+        }))))));
+    }
+
+    /* --- 2. settings --- */
+    var E = P.edit;
+    function input(label, obj, key, attrs, hint) {
+      var el = h(attrs && attrs.rows ? 'textarea' : 'input', Object.assign({ type: 'text' }, attrs || {}));
+      el.value = obj[key] === undefined ? '' : obj[key];
+      el.addEventListener('input', function () { obj[key] = el.value; });
+      return h('label', { class: 'field' }, h('span', { text: label }), el, hint ? h('p', { class: 'hint', text: hint }) : null);
+    }
+    var methodsBox = h('div', null);
+    E.methods.forEach(function (m, i) {
+      methodsBox.append(h('div', { class: 'card' },
+        input('Name shown to buyers', m, 'name', { maxlength: '40', placeholder: 'Skrill' }),
+        input('Payment details (what they should send money to)', m, 'detail', { rows: '3', maxlength: '400', placeholder: 'Skrill email: you@example.com' }),
+        input('Extra note (optional)', m, 'note', { maxlength: '300', placeholder: 'Send the exact amount. Add your email in the payment note.' }),
+        h('button', { type: 'button', class: 'btn danger small', text: 'Remove this method', onclick: function () { E.methods.splice(i, 1); render(); } })));
+    });
+    var mailHelp = h('details', { class: 'help' }, h('summary', { text: 'How to turn on email (optional)' }),
+      h('ol', { class: 'steps' },
+        h('li', { text: 'Sign up at emailjs.com, open Email Services and connect your Gmail (or another mailbox). Note the Service ID.' }),
+        h('li', { text: 'Open Email Templates and create one: To email = {{to_email}}, Subject = {{subject}}, Content = {{message}}. Note the Template ID.' }),
+        h('li', { text: 'Open Account: copy the Public Key and the Private Key, and switch on "Allow EmailJS API for non-browser applications" in the security settings.' }),
+        h('li', { text: 'In Vercel add four variables: EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY, EMAILJS_PRIVATE_KEY. Then Redeploy.' }),
+        h('li', { text: 'Come back, fill in "Send alerts to", press Save, then "Send test email".' })),
+      h('p', { class: 'hint', text: 'Without email everything still works: members see their status on the Premium page, and you see new requests here.' }));
+    root.append(h('div', { class: 'card' }, h('h3', { text: 'Premium settings' }),
+      h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: !!E.enforce, onchange: function (e) { E.enforce = e.target.checked; } }),
+        h('span', { text: 'Apply the free-plan limits (only starts once you add a payment method below)' })),
+      h('div', { class: 'two' },
+        input('Files at a time (free)', E.limits, 'maxFilesBatch', { type: 'number', min: '1' }),
+        input('Largest file in MB (free)', E.limits, 'maxFileMB', { type: 'number', min: '1' })),
+      input('Files per tool, per day (free)', E.limits, 'maxFilesDay', { type: 'number', min: '1' }, 'Counted for each tool separately and reset at 00:00 UTC. Members with Premium have no limits.'),
+      h('div', { class: 'two' }, input('Currency', E, 'currency', { maxlength: '8' }), input('Send alerts to (your email)', E, 'notifyEmail', { type: 'email', maxlength: '120' })),
+      input('Support email shown to members (optional)', E, 'contact', { type: 'email', maxlength: '120' }, 'Shown on the login and pricing pages so people can ask for a password reset. Leave empty to show no address.'),
+      h('h3', { text: 'Plans' }),
+      ['monthly', 'yearly'].map(function (k) {
+        return h('div', { class: 'two' }, input(k === 'monthly' ? 'Plan 1 name' : 'Plan 2 name', E.plans[k], 'label', { maxlength: '30' }),
+          h('div', { class: 'two' }, input('Price', E.plans[k], 'price', { placeholder: '4.99' }), input('Days', E.plans[k], 'days', { type: 'number', min: '1' })));
+      }),
+      input('Message at the top of the Premium page (optional)', E, 'intro', { rows: '2', maxlength: '600' }),
+      h('h3', { text: 'Payment methods' }),
+      h('p', { class: 'hint', text: 'Buyers see these after choosing a plan. You can add as many as you like (card, Skrill, bKash, bank, PayPal...). Think before showing a full card number: anyone can see it.' }),
+      methodsBox,
+      h('div', { class: 'bar' },
+        h('button', { type: 'button', class: 'btn small', text: '+ Add payment method', disabled: E.methods.length >= 10, onclick: function () { E.methods.push({ id: '', name: '', detail: '', note: '' }); render(); } })),
+      h('div', { class: 'bar' },
+        h('button', { type: 'button', class: 'btn primary', text: 'Save Premium settings', onclick: function (e) {
+          e.target.disabled = true;
+          acct('a_savecfg', { cfg: E }).then(function (d) { P.cfg = d.cfg; P.edit = JSON.parse(JSON.stringify(d.cfg)); notify('Saved. It is live immediately.', 'ok'); render(); })
+            .catch(function (err) { notify(err.message, 'err'); e.target.disabled = false; });
+        } }),
+        h('button', { type: 'button', class: 'btn', text: 'Send test email', disabled: !P.mail, onclick: function () {
+          acct('a_testmail', {}).then(function (d) { notify(d.mail && d.mail.ok ? 'Test email sent via ' + d.mail.via + '.' : 'Email failed: ' + (d.mail && d.mail.error), d.mail && d.mail.ok ? 'ok' : 'err'); })
+            .catch(function (err) { notify(err.message, 'err'); });
+        } })),
+      h('p', { class: 'hint', text: P.mail ? 'Email is set up (' + P.mail + ').' : 'Email is not set up yet (optional).' }),
+      mailHelp));
+
+    /* --- 3. members --- */
+    var q = P.q.trim().toLowerCase();
+    var users = (P.users || []).filter(function (u) { return !q || u.email.indexOf(q) > -1; });
+    var nPrem = (P.users || []).filter(function (u) { return u.until > Date.now(); }).length;
+    var search = h('input', { type: 'search', placeholder: 'Search members by email', 'aria-label': 'Search members', value: P.q });
+    var list = h('div', null);
+    function drawUsers() {
+      list.replaceChildren();
+      var qq = P.q.trim().toLowerCase();
+      var shown = (P.users || []).filter(function (u) { return !qq || u.email.indexOf(qq) > -1; }).slice(0, 100);
+      if (!shown.length) { list.append(h('p', { class: 'muted', text: 'No members found.' })); return; }
+      list.append(h('div', { class: 'tablewrap' }, h('table', { class: 'tbl' },
+        h('thead', null, h('tr', null, ['Member', 'Plan', 'Joined', ''].map(function (c) { return h('th', { text: c }); }))),
+        h('tbody', null, shown.map(function (u) {
+          var prem = u.until > Date.now();
+          return h('tr', null, h('td', { text: u.email }), h('td', { text: prem ? 'Premium until ' + shortDate(u.until) : 'Free' }), h('td', { text: shortDate(u.created) }),
+            h('td', null, h('div', { class: 'bar' },
+              h('button', { type: 'button', class: 'btn small', text: '+ days', onclick: function () {
+                var n = prompt('How many days of Premium to give ' + u.email + '?', '30'); if (n === null) return;
+                acct('a_grant', { email: u.email, days: n }).then(function () { notify('Done.', 'ok'); return reloadLists(); }).catch(function (e) { notify(e.message, 'err'); });
+              } }),
+              prem ? h('button', { type: 'button', class: 'btn small danger', text: 'End Premium', onclick: function () {
+                if (!confirm('End Premium for ' + u.email + ' now?')) return;
+                acct('a_revoke', { email: u.email }).then(function () { notify('Premium ended.', 'ok'); return reloadLists(); }).catch(function (e) { notify(e.message, 'err'); });
+              } }) : null,
+              h('button', { type: 'button', class: 'btn small', text: 'Reset password', onclick: function () {
+                if (!confirm('Make a temporary password for ' + u.email + '? Their old password will stop working.')) return;
+                acct('a_resetpw', { email: u.email }).then(function (d) { prompt('Temporary password for ' + u.email + ' (copy it and send it to them):', d.temp); }).catch(function (e) { notify(e.message, 'err'); });
+              } }))));
+        })))));
+    }
+    search.addEventListener('input', function () { P.q = search.value; drawUsers(); });
+    root.append(h('div', { class: 'card' }, h('h3', { text: 'Members (' + (P.users || []).length + ', ' + nPrem + ' with Premium)' }), h('label', { class: 'field' }, search), list));
+    drawUsers();
   }
 
   /* ----- analytics tab ----- */
@@ -956,6 +1131,12 @@
     try { await authCall('logout', 'POST'); } catch (err) { /* cookie expires by itself */ }
     showLogin();
   });
+
+  (function addPremiumTab() {
+    var b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.tab = 'premium'; b.setAttribute('aria-selected', 'false'); b.textContent = 'Premium';
+    $('tabs').appendChild(b);
+  })();
 
   /* ---------- already signed in? (cookie from an earlier visit) ---------- */
   (async function init() {

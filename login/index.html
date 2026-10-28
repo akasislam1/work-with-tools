@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Log in or sign up | Work With Tools</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1f4bd8">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+  .lg{min-height:calc(100vh - 160px);display:grid;place-items:start center;padding:48px 20px 24px;font-family:"Instrument Sans",system-ui,sans-serif;color:var(--wt-ink);line-height:1.55}
+  .lg *{box-sizing:border-box}
+  .lg-card{width:100%;max-width:420px;background:#fff;border:1px solid var(--wt-line);border-radius:18px;padding:28px;box-shadow:0 20px 50px -30px rgba(31,75,216,.45)}
+  .lg-card h1{margin:0 0 4px;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.8rem;letter-spacing:-.02em}
+  .lg-sub{margin:0 0 18px;color:var(--wt-mut)}
+  .lg-field{display:block;margin-top:14px}
+  .lg-field span{display:block;font-weight:600;margin-bottom:5px;font-size:.92rem}
+  .lg-field input[type=email],.lg-field input[type=password],.lg-field input[type=text]{width:100%;font:inherit;padding:12px 13px;border:1px solid var(--wt-line);border-radius:10px;background:#fff;color:var(--wt-ink)}
+  .lg-field input:focus-visible,.lg-btn:focus-visible,.lg-link:focus-visible{outline:3px solid var(--wt-blue);outline-offset:2px}
+  .lg-hint{display:block;margin-top:4px;color:var(--wt-mut);font-size:.85rem}
+  .lg-show{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.9rem;color:var(--wt-mut);cursor:pointer}
+  .lg-btn{width:100%;margin-top:18px;border:0;border-radius:11px;background:var(--wt-blue);color:#fff;font:inherit;font-weight:700;padding:13px 18px;cursor:pointer;text-align:center;text-decoration:none;display:block}
+  .lg-btn:hover:not(:disabled){background:var(--wt-blue-d)}
+  .lg-btn:disabled{opacity:.55;cursor:not-allowed}
+  .lg-btn.alt{background:#fff;color:var(--wt-ink);border:1px solid var(--wt-line)}
+  .lg-btn.alt:hover:not(:disabled){background:var(--wt-tint)}
+  .lg-err{margin:14px 0 0;padding:10px 12px;border-radius:10px;background:#fdecec;color:#a61e1e;border:1px solid #f3c4c4}
+  .lg-switch{margin:20px 0 0;text-align:center;color:var(--wt-mut)}
+  .lg-link{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--wt-blue);cursor:pointer;text-decoration:underline}
+  .lg-note{margin:14px 0 0;text-align:center;color:var(--wt-mut);font-size:.85rem}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body class="wt-home">
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+<main class="lg">
+  <div class="lg-card" id="card">
+    <p style="color:#506080">Loading…</p>
+  </div>
+</main>
+
+<script src="/assets/tools.js"></script>
+<script src="/assets/site.js"></script>
+<script>
+(function () {
+  'use strict';
+  var card = document.getElementById('card');
+  var params = new URLSearchParams(location.search);
+  var mode = params.get('mode') === 'signup' ? 'signup' : 'login';
+  var busy = false, error = '', user = null, contact = '', showPw = false;
+
+  /* only ever go back to a page on this same site (never to another website) */
+  function safeNext(v) {
+    v = String(v || '');
+    if (v.charAt(0) !== '/' || v.charAt(1) === '/' || v.charAt(1) === '\\' || /[\s\u0000-\u001f]/.test(v) || v.indexOf('/login') === 0) return '/';
+    return v;
+  }
+  var next = safeNext(params.get('next'));
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      var v = attrs[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+      else if (k === 'value' || k === 'checked' || k === 'disabled') el[k] = v;
+      else el.setAttribute(k, v === true ? '' : v);
+    });
+    for (var i = 2; i < arguments.length; i++) [].concat(arguments[i]).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      el.append(c.nodeType ? c : document.createTextNode(String(c)));
+    });
+    return el;
+  }
+  function api(action, body) {
+    return fetch('/api/acct?action=' + action, {
+      method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', 'X-WT': '1' }, body: body ? JSON.stringify(body) : undefined
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) { var e = new Error(d.message || ('Something went wrong (' + r.status + ').')); e.code = d.code; throw e; }
+        return d;
+      });
+    });
+  }
+  function go() { location.href = next; }
+
+  function submit(e) {
+    e.preventDefault();
+    var f = e.target, email = f.elements.email.value.trim(), password = f.elements.password.value;
+    if (!email || !password) { error = 'Please enter your email and password.'; draw(); return; }
+    busy = true; error = ''; draw();
+    api(mode === 'signup' ? 'signup' : 'login', { email: email, password: password })
+      .then(function () { try { localStorage.removeItem('wt_plan'); } catch (x) { /* ignore */ } go(); })
+      .catch(function (err) { busy = false; error = err.message; draw(); });
+  }
+  function signOut() {
+    api('logout', {}).then(function () { try { localStorage.removeItem('wt_plan'); } catch (x) { /* ignore */ } user = null; draw(); });
+  }
+
+  function draw() {
+    card.replaceChildren();
+    if (user) {
+      card.append(h('h1', { text: 'You are signed in' }), h('p', { class: 'lg-sub', text: user.email }),
+        h('a', { class: 'lg-btn', href: next, text: next === '/' ? 'Continue to the tools' : 'Continue' }),
+        h('button', { type: 'button', class: 'lg-btn alt', text: 'Sign out', onclick: signOut }));
+      return;
+    }
+    var signup = mode === 'signup';
+    var pw = h('input', { type: showPw ? 'text' : 'password', name: 'password', autocomplete: signup ? 'new-password' : 'current-password', required: true, minlength: signup ? '8' : null, maxlength: '200' });
+    var form = h('form', { onsubmit: submit, novalidate: true },
+      h('label', { class: 'lg-field' }, h('span', { text: 'Email' }), h('input', { type: 'email', name: 'email', autocomplete: 'email', required: true, maxlength: '120', autofocus: true })),
+      h('label', { class: 'lg-field' }, h('span', { text: 'Password' }), pw, signup ? h('small', { class: 'lg-hint', text: 'At least 8 characters.' }) : null),
+      h('label', { class: 'lg-show' }, h('input', { type: 'checkbox', checked: showPw, onchange: function (e) { showPw = e.target.checked; pw.type = showPw ? 'text' : 'password'; } }), 'Show password'),
+      error ? h('p', { class: 'lg-err', role: 'alert', text: error }) : null,
+      h('button', { type: 'submit', class: 'lg-btn', disabled: busy, text: busy ? 'Please wait…' : (signup ? 'Create account' : 'Log in') }));
+    card.append(
+      h('h1', { text: signup ? 'Create your account' : 'Log in' }),
+      h('p', { class: 'lg-sub', text: signup ? 'An account is only needed to buy Premium. The free tools work without one.' : 'Welcome back! Log in to use your Premium plan.' }),
+      form,
+      h('p', { class: 'lg-switch' }, signup ? 'Already have an account? ' : "Don't have an account? ",
+        h('button', { type: 'button', class: 'lg-link', text: signup ? 'Log in' : 'Sign up', onclick: function () { mode = signup ? 'login' : 'signup'; error = ''; draw(); } })),
+      !signup ? h('p', { class: 'lg-note' }, 'Forgot your password? ' + (contact ? 'Email ' : 'Please contact the site owner and we will reset it.'), contact ? h('a', { href: 'mailto:' + contact, text: contact }) : null) : null);
+  }
+
+  Promise.all([api('me'), api('plans')]).then(function (r) { user = r[0].user || null; contact = r[1].contact || ''; if (r[0].enabled === false) error = 'Accounts are not switched on yet. Please check back soon.'; })
+    .catch(function () { /* show the form anyway */ })
+    .then(draw);
+})();
+</script>
+</body>
+</html>

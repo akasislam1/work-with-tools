@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pricing – Go Premium for unlimited use and no ads | Work With Tools</title>
+<meta name="description" content="Compare the free plan with Premium: unlimited files, no daily limits and no ads. The free plan needs no sign-up.">
+<meta name="theme-color" content="#1f4bd8">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+  .pm{max-width:960px;margin:0 auto;padding:0 20px;font-family:"Instrument Sans",system-ui,sans-serif;color:var(--wt-ink);line-height:1.55}
+  .pm *{box-sizing:border-box}
+  .pm-hero{padding:44px 0 6px;text-align:center}
+  .pm-hero h1{margin:0;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:clamp(2rem,5vw,3rem);letter-spacing:-.03em;line-height:1.08}
+  .pm-hero p{margin:12px auto 0;max-width:56ch;color:var(--wt-mut);font-size:1.06rem}
+  .pm-toggle-wrap{display:flex;justify-content:center;margin:28px 0 22px}
+  .pm-toggle{position:relative;display:inline-flex;background:#eef1f6;border:1px solid var(--wt-line);border-radius:999px;padding:4px}
+  .pm-toggle button{border:0;background:none;font:inherit;font-weight:600;color:var(--wt-mut);padding:10px 22px;border-radius:999px;cursor:pointer}
+  .pm-toggle button[aria-pressed=true]{background:#fff;color:var(--wt-ink);box-shadow:0 1px 4px rgba(12,26,58,.18)}
+  .pm-toggle button:focus-visible,.pm-btn:focus-visible{outline:3px solid var(--wt-blue);outline-offset:2px}
+  .pm-off{position:absolute;right:-12px;top:-14px;background:#b9f3d4;color:#0b5a33;font-size:.78rem;font-weight:800;padding:5px 9px;border-radius:999px}
+  .pm-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:820px;margin:0 auto}
+  .pm-plan{border:1px solid var(--wt-line);border-radius:26px;padding:26px;background:#fff;display:flex;flex-direction:column;min-height:460px}
+  .pm-plan.premium{background:#fff1cf;border-color:#f5d78a}
+  .pm-ph{display:flex;align-items:center;gap:12px}
+  .pm-ico{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#fdecec;flex:none}
+  .pm-plan.premium .pm-ico{background:#f5a524}
+  .pm-ico svg{width:26px;height:26px;fill:none;stroke:#0c1a3a;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .pm-ph h2{margin:0;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.6rem;letter-spacing:-.01em}
+  .pm-price{margin-top:22px;min-height:92px}
+  .pm-price .big{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:2.5rem;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .pm-price .big small{font-family:"Instrument Sans",system-ui,sans-serif;font-size:1rem;font-weight:500;color:var(--wt-mut)}
+  .pm-price .sub{margin-top:6px;color:#4a5878}
+  .pm-btn{display:block;width:100%;border:0;border-radius:11px;background:var(--wt-blue);color:#fff;font:inherit;font-weight:700;padding:13px 18px;cursor:pointer;text-align:center;text-decoration:none}
+  .pm-btn:hover:not(:disabled){background:var(--wt-blue-d)}
+  .pm-btn:disabled{opacity:.55;cursor:not-allowed}
+  .pm-btn.free{background:#fff;color:#d12a2a;border:2px solid #d12a2a}
+  .pm-btn.free:hover{background:#fff4f4}
+  .pm-btn.gold{background:#fbbf24;color:#0c1a3a}
+  .pm-btn.gold:hover:not(:disabled){background:#f5ae0a}
+  .pm-btn.alt{background:#fff;color:var(--wt-ink);border:1px solid var(--wt-line)}
+  .pm-btn.alt:hover:not(:disabled){background:var(--wt-tint)}
+  .pm-btn.inline{display:inline-block;width:auto}
+  .pm-btn.small{padding:7px 13px;font-size:.9rem;border-radius:9px}
+  .pm-fl{margin:22px 0 8px;font-weight:700}
+  .pm-list{margin:0;padding:0;list-style:none}
+  .pm-list li{position:relative;padding:5px 0 5px 28px}
+  .pm-list li::before{content:"";position:absolute;left:2px;top:11px;width:16px;height:9px;border-left:3px solid #2bb673;border-bottom:3px solid #2bb673;transform:rotate(-45deg) scale(.9)}
+  .pm-card{background:#fff;border:1px solid var(--wt-line);border-radius:18px;padding:24px;margin:22px auto 0;max-width:820px}
+  .pm-card h2{margin:0 0 10px;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.35rem}
+  .pm-card h3{margin:20px 0 6px;font-size:1.02rem}
+  .pm-muted{color:var(--wt-mut)}
+  .pm-small{font-size:.88rem}
+  .pm-field{display:block;margin-top:12px}
+  .pm-field span{display:block;font-weight:600;margin-bottom:4px;font-size:.92rem}
+  .pm-field input[type=text]{width:100%;font:inherit;padding:11px 12px;border:1px solid var(--wt-line);border-radius:10px;background:#fff;color:var(--wt-ink)}
+  .pm-field input:focus-visible{outline:3px solid var(--wt-blue);outline-offset:2px}
+  .pm-err{margin:16px auto 0;max-width:820px;padding:11px 14px;border-radius:10px;background:#fdecec;color:#a61e1e;border:1px solid #f3c4c4}
+  .pm-ok{margin:16px auto 0;max-width:820px;padding:11px 14px;border-radius:10px;background:#e8f6ee;color:#17623a;border:1px solid #bfe3cd}
+  .pm-info{margin:16px auto 0;max-width:820px;padding:11px 14px;border-radius:10px;background:var(--wt-tint);color:var(--wt-ink)}
+  .pm-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .pm-method{display:block;border:1px solid var(--wt-line);border-radius:12px;padding:12px 14px;margin-top:10px;cursor:pointer}
+  .pm-method input{margin-right:8px;accent-color:var(--wt-blue)}
+  .pm-method.sel{border-color:var(--wt-blue);background:var(--wt-tint)}
+  .pm-detail{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px dashed var(--wt-line);border-radius:10px;padding:10px 12px;margin-top:8px;font-weight:600}
+  .pm-shot{margin-top:10px;max-width:240px;max-height:240px;border-radius:10px;border:1px solid var(--wt-line);display:block}
+  .pm-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:var(--wt-tint);color:var(--wt-blue)}
+  .pm-badge.ok{background:#e8f6ee;color:#17623a}
+  .pm-badge.no{background:#fdecec;color:#a61e1e}
+  .pm-badge.wait{background:#fff5e0;color:#8a5300}
+  .pm-steps{margin:0;padding-left:20px}
+  .pm-steps li{padding:3px 0}
+  .pm-rl{margin:0;padding:0;list-style:none}
+  .pm-rl li{padding:10px 0;border-bottom:1px solid var(--wt-line)}
+  .pm-rl li:last-child{border-bottom:0}
+  .pm-foot{height:20px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body class="wt-home">
+<div class="wt-bar"><a class="wt-logo" href="/"><span class="wt-mark">W</span>Work With Tools</a><a class="wt-all" href="/">All tools</a></div>
+
+<main class="pm">
+  <header class="pm-hero">
+    <h1>Choose your plan</h1>
+    <p id="intro">Use every tool as much as you like, with no ads. You can always keep using the free plan without signing up.</p>
+  </header>
+  <div id="app" aria-live="polite"><p class="pm-muted" style="text-align:center">Loading…</p></div>
+  <div class="pm-foot"></div>
+</main>
+
+<script src="/assets/tools.js"></script>
+<script src="/assets/site.js"></script>
+<script>
+(function () {
+  'use strict';
+  var app = document.getElementById('app');
+  var params = new URLSearchParams(location.search);
+  var S = { enabled: true, user: null, available: false, enforce: false, currency: 'USD', plans: {}, limits: {}, intro: '', contact: '',
+            methods: [], mine: [], billing: 'yearly', pick: '', methodId: '', msg: null, busy: false, proof: '', ref: '' };
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      var v = attrs[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+      else if (k === 'value' || k === 'checked' || k === 'disabled') el[k] = v;
+      else el.setAttribute(k, v === true ? '' : v);
+    });
+    for (var i = 2; i < arguments.length; i++) [].concat(arguments[i]).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      el.append(c.nodeType ? c : document.createTextNode(String(c)));
+    });
+    return el;
+  }
+  function svg(paths) {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
+    paths.forEach(function (d) { var p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); s.appendChild(p); });
+    return s;
+  }
+  function api(action, body) {
+    return fetch('/api/acct?action=' + action, {
+      method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', 'X-WT': '1' }, body: body ? JSON.stringify(body) : undefined
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) { var e = new Error(d.message || ('Something went wrong (' + r.status + ').')); e.code = d.code; e.status = r.status; throw e; }
+        return d;
+      });
+    });
+  }
+  function fmtDate(ms) { return new Date(ms).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); }
+  function say(type, text) { S.msg = text ? { type: type, text: text } : null; }
+  var SYM = { USD: '$', EUR: '\u20AC', GBP: '\u00A3', BDT: '\u09F3', INR: '\u20B9' };
+  function money(v) { var n = Number(v).toFixed(2).replace(/\.00$/, ''); return SYM[S.currency] ? SYM[S.currency] + n : n + ' ' + S.currency; }
+  function perMonth(p) { return parseFloat(p.price) / (p.days / 30); }
+
+  /* screenshot -> small JPEG (under about 500 KB) */
+  function toJpeg(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('That file is not an image.')); };
+      img.onload = function () {
+        try {
+          var scales = [1, 0.75, 0.55], quals = [0.72, 0.55, 0.4], out = '';
+          for (var s = 0; s < scales.length && !out; s++) {
+            var k = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight)) * scales[s];
+            var c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+            var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+            for (var q = 0; q < quals.length && !out; q++) { var d = c.toDataURL('image/jpeg', quals[q]); if (d.length <= 650000) out = d; }
+          }
+          URL.revokeObjectURL(url);
+          if (!out) reject(new Error('This image is too large. Please send a smaller screenshot.')); else resolve(out);
+        } catch (e) { URL.revokeObjectURL(url); reject(new Error('Could not read that image.')); }
+      };
+      img.src = url;
+    });
+  }
+
+  /* ---------- loading ---------- */
+  function load() {
+    return Promise.all([api('plans'), api('me')]).then(function (r) {
+      var p = r[0], m = r[1];
+      S.enabled = p.enabled !== false; S.available = !!p.available; S.enforce = !!p.enforce; S.currency = p.currency || 'USD';
+      S.plans = p.plans || {}; S.limits = p.limits || {}; S.intro = p.intro || ''; S.contact = p.contact || '';
+      S.user = m.user || null;
+      if (S.user) return api('mypay').then(function (d) { S.mine = d.list || []; }).catch(function () { S.mine = []; });
+      S.mine = [];
+    }).catch(function (e) { say('err', e.message); });
+  }
+
+  /* ---------- actions ---------- */
+  function loginUrl(planKey) { return '/login/?next=' + encodeURIComponent('/premium/?plan=' + planKey); }
+  function getPremium() {
+    var key = S.billing;
+    if (!S.available) { say('info', 'Payments are not open yet. Please check back soon.'); draw(); return; }
+    if (!S.user) { location.href = loginUrl(key); return; }
+    openCheckout(key);
+  }
+  function openCheckout(key) {
+    S.pick = key; say(null);
+    api('methods').then(function (d) {
+      S.methods = d.methods || []; S.methodId = S.methods.length ? S.methods[0].id : ''; S.proof = ''; S.ref = '';
+      draw(); var el = document.getElementById('checkout'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }).catch(function (err) {
+      if (err.status === 401) { location.href = loginUrl(key); return; }
+      say('err', err.message); draw();
+    });
+  }
+  function signOut() {
+    api('logout', {}).then(function () { try { localStorage.removeItem('wt_plan'); } catch (x) { /* ignore */ } location.reload(); });
+  }
+  function pickFile(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    say(null);
+    toJpeg(file).then(function (d) { S.proof = d; draw(); }).catch(function (err) { S.proof = ''; say('err', err.message); draw(); });
+  }
+  function submitPay(e) {
+    e.preventDefault();
+    if (!S.proof) { say('err', 'Please attach a screenshot of your payment.'); draw(); return; }
+    S.busy = true; say(null); draw();
+    api('pay', { plan: S.pick, method: S.methodId, ref: e.target.elements.ref.value, proof: S.proof })
+      .then(function () { S.busy = false; S.pick = ''; S.proof = ''; S.ref = ''; say('ok', 'Thank you! Your payment is waiting for approval. As soon as we check it, your Premium starts. Just refresh this page.'); return api('mypay').then(function (d) { S.mine = d.list || []; }); })
+      .then(draw)
+      .catch(function (err) { S.busy = false; say('err', err.message); draw(); });
+  }
+  function refresh() { load().then(function () { say('info', S.user && S.user.premium ? 'Updated. Your Premium is active.' : 'Updated.'); draw(); }); }
+
+  /* ---------- pieces ---------- */
+  function msgBox() { return S.msg ? h('p', { class: 'pm-' + (S.msg.type === 'err' ? 'err' : S.msg.type === 'ok' ? 'ok' : 'info'), role: S.msg.type === 'err' ? 'alert' : 'status', text: S.msg.text }) : null; }
+
+  function toggle() {
+    var m = S.plans.monthly, y = S.plans.yearly;
+    if (!m || !y) return null;
+    var off = Math.round((1 - perMonth(y) / perMonth(m)) * 100);
+    function btn(key, label) { return h('button', { type: 'button', 'aria-pressed': String(S.billing === key), text: label, onclick: function () { S.billing = key; draw(); } }); }
+    return h('div', { class: 'pm-toggle-wrap' }, h('div', { class: 'pm-toggle', role: 'group', 'aria-label': 'Billing period' },
+      btn('monthly', 'Monthly Billing'), btn('yearly', 'Yearly Billing'), off > 0 ? h('span', { class: 'pm-off', text: '-' + off + '%' }) : null));
+  }
+
+  function freeCard() {
+    var L = S.limits || {}, items = ['Use every tool', 'No sign-up needed'];
+    if (S.enforce) items.push('Up to ' + L.maxFilesBatch + ' files at a time', 'Files up to ' + L.maxFileMB + ' MB', 'Up to ' + L.maxFilesDay + ' files per tool, each day');
+    items.push('Ads on the site');
+    return h('div', { class: 'pm-plan' },
+      h('div', { class: 'pm-ph' }, h('div', { class: 'pm-ico' }, svg(['M20 12v9H4v-9', 'M2 7h20v5H2z', 'M12 21V7', 'M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z', 'M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z'])), h('h2', { text: 'Free' })),
+      h('div', { class: 'pm-price' }, h('div', { class: 'big', text: 'Free' })),
+      h('a', { class: 'pm-btn free', href: '/', text: 'Start for free' }),
+      h('div', { class: 'pm-fl', text: 'Free features include:' }),
+      h('ul', { class: 'pm-list' }, items.map(function (t) { return h('li', { text: t }); })));
+  }
+
+  function premiumCard() {
+    var p = S.plans[S.billing] || S.plans.monthly || S.plans.yearly;
+    if (!p) return null;
+    var yearly = S.billing === 'yearly' && S.plans.yearly;
+    var pm = perMonth(p), items = ['Full access to all tools'];
+    if (S.enforce) items.push('Unlimited files at a time', 'No daily limit', 'No file-size limit from us');
+    items.push('No ads', 'Helps us keep the tools free for everyone');
+    var label = !S.available ? 'Coming soon' : (S.user && S.user.premium ? 'Extend Premium' : 'Get Premium');
+    return h('div', { class: 'pm-plan premium' },
+      h('div', { class: 'pm-ph' }, h('div', { class: 'pm-ico' }, svg(['M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z'])), h('h2', { text: 'Premium' })),
+      h('div', { class: 'pm-price' },
+        h('div', { class: 'big' }, money(pm) + ' ', h('small', { text: '/ month' })),
+        h('div', { class: 'sub', text: yearly ? money(p.price) + ' billed once for ' + p.days + ' days' : money(p.price) + ' for ' + p.days + ' days, no automatic renewal' })),
+      h('button', { type: 'button', class: 'pm-btn gold', text: label, disabled: !S.available, onclick: getPremium }),
+      h('div', { class: 'pm-fl', text: 'Premium features include:' }),
+      h('ul', { class: 'pm-list' }, items.map(function (t) { return h('li', { text: t }); })));
+  }
+
+  function accountCard() {
+    var u = S.user;
+    return h('div', { class: 'pm-card' }, h('div', { class: 'pm-row' },
+      h('div', null, h('div', { class: 'pm-small pm-muted', text: 'Signed in as' }), h('strong', { text: u.email }), ' ',
+        u.premium ? h('span', { class: 'pm-badge ok', text: 'Premium until ' + fmtDate(u.until) }) : h('span', { class: 'pm-badge', text: 'Free plan' })),
+      h('div', null, h('button', { type: 'button', class: 'pm-btn alt small inline', text: 'Refresh', onclick: refresh }), ' ',
+        h('button', { type: 'button', class: 'pm-btn alt small inline', text: 'Sign out', onclick: signOut }))),
+      u.premium ? h('p', { class: 'pm-muted pm-small', text: 'Thank you for supporting us! If you pay again, the new time is added on top of what you have left.' }) : null);
+  }
+
+  function checkout() {
+    var p = S.plans[S.pick];
+    if (!p) return null;
+    var sel = S.methods.filter(function (m) { return m.id === S.methodId; })[0];
+    if (!S.methods.length) return h('div', { class: 'pm-card', id: 'checkout' }, h('h2', { text: 'Payment methods are coming soon' }), h('p', { class: 'pm-muted', text: 'We have not added a way to pay yet. Please check back soon.' }),
+      h('button', { type: 'button', class: 'pm-btn alt inline', text: 'Back', onclick: function () { S.pick = ''; draw(); } }));
+    var form = h('form', { onsubmit: submitPay, novalidate: true },
+      h('h3', { text: '1. Choose how you will pay' }),
+      S.methods.map(function (m) {
+        return h('label', { class: 'pm-method' + (m.id === S.methodId ? ' sel' : '') },
+          h('input', { type: 'radio', name: 'method', value: m.id, checked: m.id === S.methodId, onchange: function () { S.methodId = m.id; draw(); } }), h('strong', { text: m.name }));
+      }),
+      sel ? h('div', null,
+        h('h3', { text: '2. Send ' + money(p.price) }),
+        h('div', { class: 'pm-detail', text: sel.detail }),
+        sel.note ? h('p', { class: 'pm-muted pm-small', text: sel.note }) : null) : null,
+      h('h3', { text: '3. Upload a screenshot of your payment' }),
+      h('input', { type: 'file', accept: 'image/*', 'aria-label': 'Payment screenshot', onchange: pickFile }),
+      S.proof ? h('img', { class: 'pm-shot', src: S.proof, alt: 'Your screenshot' }) : null,
+      h('label', { class: 'pm-field' }, h('span', { text: 'Transaction ID or sender name (optional)' }), h('input', { type: 'text', name: 'ref', maxlength: '200', autocomplete: 'off', value: S.ref, oninput: function (e) { S.ref = e.target.value; } })),
+      h('h3', { text: '4. Send for approval' }),
+      h('p', null, h('button', { type: 'submit', class: 'pm-btn gold inline', disabled: S.busy || !sel, text: S.busy ? 'Sending…' : 'Send for approval' }), ' ',
+        h('button', { type: 'button', class: 'pm-btn alt inline', text: 'Cancel', onclick: function () { S.pick = ''; say(null); draw(); } })),
+      h('p', { class: 'pm-muted pm-small', text: 'We check payments by hand, so it can take a little while. Your screenshot is deleted after we decide.' }));
+    return h('div', { class: 'pm-card', id: 'checkout' }, h('h2', { text: 'Get ' + (p.label || 'Premium') + ' \u2013 ' + money(p.price) }), form);
+  }
+
+  function mine() {
+    if (!S.mine.length) return null;
+    return h('div', { class: 'pm-card' }, h('h2', { text: 'Your payment requests' }),
+      h('ul', { class: 'pm-rl' }, S.mine.map(function (r) {
+        var cls = r.status === 'approved' ? 'ok' : r.status === 'rejected' ? 'no' : 'wait';
+        var label = r.status === 'approved' ? 'Approved' : r.status === 'rejected' ? 'Not approved' : 'Waiting for approval';
+        return h('li', null, h('div', { class: 'pm-row' }, h('span', null, h('strong', { text: r.plan }), ' \u00B7 ' + r.amount + ' ' + r.currency + ' \u00B7 ' + r.method),
+          h('span', { class: 'pm-badge ' + cls, text: label })),
+          h('div', { class: 'pm-small pm-muted', text: fmtDate(r.created) + (r.note ? ' \u00B7 ' + r.note : '') }));
+      })));
+  }
+
+  function how() {
+    return h('div', { class: 'pm-card' }, h('h2', { text: 'How it works' }),
+      h('ol', { class: 'pm-steps' },
+        h('li', { text: 'Choose a plan and press Get Premium. You will be asked to log in or create a free account.' }),
+        h('li', { text: 'Pick a payment method and send the amount shown.' }),
+        h('li', { text: 'Upload a screenshot of your payment.' }),
+        h('li', { text: 'We check it. Once approved you get an email and Premium starts. Refresh the website to see it.' })),
+      h('p', { class: 'pm-muted pm-small' }, 'Premium does not renew by itself. When it ends, you go back to the free plan, and you can pay again any time.' + (S.contact ? ' Questions? ' : ''),
+        S.contact ? h('a', { href: 'mailto:' + S.contact, text: S.contact }) : null));
+  }
+
+  function draw() {
+    document.getElementById('intro').textContent = S.intro || 'Use every tool as much as you like, with no ads. You can always keep using the free plan without signing up.';
+    app.replaceChildren();
+    if (!S.enabled) {
+      app.append(h('div', { class: 'pm-card' }, h('h2', { text: 'Premium is not open yet' }), h('p', { class: 'pm-muted', text: 'Please check back soon. All tools keep working for free in the meantime.' })));
+      return;
+    }
+    var parts = [msgBox(), toggle(), h('div', { class: 'pm-plans' }, freeCard(), premiumCard())];
+    if (S.user) parts.push(accountCard());
+    parts.push(checkout(), mine(), how());
+    app.append.apply(app, parts.filter(Boolean));
+  }
+
+  load().then(function () {
+    var want = params.get('plan');
+    if (want && S.plans[want]) S.billing = want;
+    draw();
+    if (want && S.plans[want] && S.available) {
+      if (S.user) openCheckout(want); else location.replace(loginUrl(want));
+    }
+  });
+})();
+</script>
+</body>
+</html>
